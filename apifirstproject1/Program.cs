@@ -69,7 +69,7 @@ catch (Exception ex)
     Console.WriteLine("**************************************");
 }
 
-Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$");
+Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$");
 
 if (app.Environment.IsDevelopment())
 {
