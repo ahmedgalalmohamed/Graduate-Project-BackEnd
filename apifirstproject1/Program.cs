@@ -69,6 +69,7 @@ catch (Exception ex)
     Console.WriteLine("**************************************");
 }
 
+Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$");
 
 if (app.Environment.IsDevelopment())
 {
@@ -86,6 +87,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Console.WriteLine("hi hi hi hi hji");
+Console.WriteLine("mphchusg i hji");
 
 app.Run();
