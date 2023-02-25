@@ -86,6 +86,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
+Console.WriteLine("hi hi hi hi hji");
 
 app.Run();
