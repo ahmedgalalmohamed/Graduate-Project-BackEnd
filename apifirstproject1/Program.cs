@@ -69,7 +69,7 @@ catch (Exception ex)
     Console.WriteLine("**************************************");
 }
 
-Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$");
+Console.WriteLine("ahmed galal mohamed lllll");
 
 if (app.Environment.IsDevelopment())
 {
