@@ -22,6 +22,7 @@ namespace Graduate_Project_BackEnd
              claims,
              expires: DateTime.Now.AddDays(1),
              signingCredentials: credentials);
+            Console.WriteLine("ahmed galal");
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
