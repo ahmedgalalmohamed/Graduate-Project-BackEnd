@@ -173,7 +173,9 @@ namespace Graduate_Project_BackEnd.Controllers
             DB.Notifications.Update(notification);
             DB.SaveChanges();
             var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
-            if (std != null)
+            var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+            var cour_std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == notification.SenderId && s.CourseID == team[0].CourseID);
+            if (std != null && cour_std !=null && cour_std.TeamID == null)
             {
                 NotificationModel newNotification = new NotificationModel()
                 {
@@ -187,12 +189,11 @@ namespace Graduate_Project_BackEnd.Controllers
                 DB.SaveChanges();
                 if (accept)
                 {
-                    var team = DB.Teams.Where(t => t.Id == notification.TeamId).Select(t => t.CourseID).ToList();
                     if (team.Count > 0)
                     {
                         if (setComplete(notification.TeamId))
                             return Json(new { state = false, msg = "Team is Complete" });
-                        var cour_Std = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == std.Id && cs.CourseID == team[0]);
+                        var cour_Std = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == std.Id && cs.CourseID == team[0].CourseID);
                         if (cour_Std != null)
                         {
                             cour_Std.TeamID = notification.TeamId;
