@@ -91,8 +91,6 @@ namespace apifirstproject1.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Desciption = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsGraduate = table.Column<bool>(type: "bit", nullable: false),
-                    MinStd = table.Column<int>(type: "int", nullable: false),
-                    MaxStd = table.Column<int>(type: "int", nullable: false),
                     InstructorID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -107,73 +105,6 @@ namespace apifirstproject1.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "profNotifications",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProfId = table.Column<int>(type: "int", nullable: false),
-                    SenderId = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TeamId = table.Column<int>(type: "int", nullable: false),
-                    IsReaded = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_profNotifications", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_profNotifications_Proffessors_ProfId",
-                        column: x => x.ProfId,
-                        principalTable: "Proffessors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SenderId = table.Column<int>(type: "int", nullable: false),
-                    SenderRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TeamId = table.Column<int>(type: "int", nullable: false),
-                    IsReaded = table.Column<bool>(type: "bit", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notifications_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Skils",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentID = table.Column<int>(type: "int", nullable: false),
-                    skil = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Skils", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Skils_Students_StudentID",
-                        column: x => x.StudentID,
-                        principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
@@ -182,7 +113,9 @@ namespace apifirstproject1.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LeaderID = table.Column<int>(type: "int", nullable: false),
                     CourseID = table.Column<int>(type: "int", nullable: false),
-                    ProfID = table.Column<int>(type: "int", nullable: false),
+                    ProfID = table.Column<int>(type: "int", nullable: true),
+                    MinStd = table.Column<int>(type: "int", nullable: false),
+                    MaxStd = table.Column<int>(type: "int", nullable: false),
                     IsComplete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -288,11 +221,6 @@ namespace apifirstproject1.Migrations
                 filter: "[Phone] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_StudentId",
-                table: "Notifications",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Proffessors_Email",
                 table: "Proffessors",
                 column: "Email",
@@ -306,19 +234,9 @@ namespace apifirstproject1.Migrations
                 filter: "[Phone] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_profNotifications_ProfId",
-                table: "profNotifications",
-                column: "ProfId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Projects_TeamID",
                 table: "Projects",
                 column: "TeamID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Skils_StudentID",
-                table: "Skils",
-                column: "StudentID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_Email",
@@ -358,16 +276,7 @@ namespace apifirstproject1.Migrations
                 name: "Courses_Students");
 
             migrationBuilder.DropTable(
-                name: "Notifications");
-
-            migrationBuilder.DropTable(
-                name: "profNotifications");
-
-            migrationBuilder.DropTable(
                 name: "Projects");
-
-            migrationBuilder.DropTable(
-                name: "Skils");
 
             migrationBuilder.DropTable(
                 name: "Teams");

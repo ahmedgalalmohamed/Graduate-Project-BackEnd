@@ -89,7 +89,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     return Json(new { state = false, msg = "failed" });
                 }
-             
+
                 switch (role.ToLower())
                 {
                     case "student":
@@ -218,8 +218,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { state = false, msg = "Failed To Update" });
         }
-
-        [HttpPost]
+		[HttpPost]
         public IActionResult ChangeImg([FromForm] IFormFile file)
         {
             var currentUser = GetCurrentUser();
@@ -240,7 +239,7 @@ namespace Graduate_Project_BackEnd.Controllers
                     student.img = img;
                     DB.Students.Update(student);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success",data=img });
 
                 case "instructor":
                     var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
@@ -249,7 +248,7 @@ namespace Graduate_Project_BackEnd.Controllers
                     instructor.img = img;
                     DB.Instructors.Update(instructor);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success",data=img });
 
                 case "proffessor":
                     var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
@@ -258,15 +257,13 @@ namespace Graduate_Project_BackEnd.Controllers
                     prof.img = img;
                     DB.Proffessors.Update(prof);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success",data=img });
 
                 default:
                     return Json(new { state = false, msg = "Role Invalid" });
             }
             return Json(new { state = false, msg = "Failed To Update" });
         }
-
-
         private UserLoginVM GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
