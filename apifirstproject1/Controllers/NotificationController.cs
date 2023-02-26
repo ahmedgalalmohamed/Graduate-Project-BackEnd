@@ -49,7 +49,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 var team = DB.Teams.Where(t => t.Id == notification.TeamId && t.CourseID == notification.CourseId).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
                 if (team.Count > 0)
                 {
-                    var course_std = DB.Courses_Students.SingleOrDefault(cs => cs.Student.Email == currentUser.Email && cs.CourseID == notification.CourseId && cs.TeamID == null);
+                    var course_std = DB.Courses_Students.SingleOrDefault(cs => cs.Student.Email == currentUser.Email && cs.CourseID == notification.CourseId);
                     if (course_std != null)
                     {
                         var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
@@ -60,6 +60,8 @@ namespace Graduate_Project_BackEnd.Controllers
                         var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
                         if (notifications.Count == 0)
                         {
+                            if (course_std.TeamID != null)
+                                return Json(new { state = false, msg = "You are already in team" });
                             if (notification.Content.ToLower().Contains("team"))
                             {
                                 DB.Notifications.Add(new NotificationModel()
@@ -87,7 +89,6 @@ namespace Graduate_Project_BackEnd.Controllers
                         }
                         return Json(new { state = false, msg = "Request is already sent" });
                     }
-                    return Json(new { state = false, msg = "You are already in team" });
                 }
             }
             return Json(new { state = false, msg = "failed" });

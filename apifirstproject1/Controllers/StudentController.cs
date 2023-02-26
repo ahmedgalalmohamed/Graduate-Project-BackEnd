@@ -62,7 +62,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 List<int> courses = new List<int>();
                 foreach (var cour in cour_std)
                     courses.Add((int)cour.CourseID);
-                StudentVM.Add(new StudentVM() { Name = std.Name, Email = std.Email, Semester = std.Semester, CoursesID = courses });
+                StudentVM.Add(new StudentVM() { Name = std.Name, Email = std.Email, Semester = std.Semester, CoursesID = courses,Password =std.Password });
             }
             return Json(new { state = true, msg = "Success", data = StudentVM });
         }
