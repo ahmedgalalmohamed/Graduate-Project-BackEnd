@@ -212,13 +212,13 @@ namespace Graduate_Project_BackEnd.Controllers
             DB.Notifications.Update(notification);
             DB.SaveChanges();
             var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
-            var std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == notification.SenderId && s.CourseID == team[0].CourseID);
+            var std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == currentUser.Id && s.CourseID == team[0].CourseID);
             if (std != null && std.TeamID != null)
             {
                 NotificationModel newNotification = new NotificationModel()
                 {
                     SenderId = (int)currentUser.Id,
-                    StudentId = std.StudentID,
+                    StudentId = notification.SenderId,
                     TeamId = notification.TeamId,
                     Content = accept ? "Accepted" : "Rejected",
                     SenderRole = currentUser.Role,
