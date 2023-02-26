@@ -57,7 +57,7 @@ namespace Graduate_Project_BackEnd.Controllers
                             return Json(new { state = false, msg = "failed to send request" });
                         if (setComplete(notification.TeamId))
                             return Json(new { state = false, msg = "Team is Complete" });
-                        var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
+                        var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && (n.SenderId == currentUser.Id || n.SenderId == currentUser.Id) && n.Content.Contains("Request")).ToList();
                         if (notifications.Count == 0)
                         {
                             if (notification.Content.ToLower().Contains("team"))
@@ -236,7 +236,6 @@ namespace Graduate_Project_BackEnd.Controllers
                         return Json(new { state = false, msg = "Team is Complete" });
                 }
             }
-
             return getNotification();
         }
 

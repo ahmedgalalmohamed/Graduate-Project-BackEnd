@@ -89,7 +89,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     var availableTeams = DB.Teams.Where(t => t.CourseID == id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { t.CourseID }).ToList();
                     var availableStd = DB.Courses_Students.Where(cs => cs.StudentID != currentUser.Id && cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
-                    var availablePro = DB.Proffessors.Where(p => p.TeamCount>DB.Teams.Where(t=>t.ProfID == p.Id).Select(t=> t.Name).ToList().Count).ToList().Count;
+                    var availablePro = DB.Proffessors.Where(p => p.TeamCount > DB.Teams.Where(t => t.ProfID == p.Id).Select(t => t.Name).ToList().Count).ToList().Count;
 
                     var myTeam = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == std.Id && cs.CourseID == course.Id && cs.TeamID != null);
                     CourseStudentVM studentVM = new()

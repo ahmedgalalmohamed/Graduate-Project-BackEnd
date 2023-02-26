@@ -199,8 +199,6 @@ namespace Graduate_Project_BackEnd.Controllers
         }
 
 
-
-
         private UserLoginVM GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
