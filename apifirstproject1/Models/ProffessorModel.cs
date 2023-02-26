@@ -22,6 +22,7 @@ namespace Graduate_Project_BackEnd.Models
         public string? img { get; set; } = "";
         public int TeamCount { get; set; } = 3;
 
+        public List<ProfNotificationsModel> Notifications { get; set; }
         public ICollection<TeamModel> Teams { get; set; }
     }
 }

@@ -26,8 +26,8 @@ namespace Graduate_Project_BackEnd.Controllers
                     return Json(new { state = false, msg = "Failed Not found student in this course" });
                 if (courseStudent.TeamID != null)
                     return Json(new { state = false, msg = "Failed The Student is already in team" });
-                var teamfound = DB.Teams.SingleOrDefault(s => s.Name.Equals(team.TeamName));
-                if (teamfound != null)
+                var teamfound = DB.Teams.Where(s => s.Name.Equals(team.TeamName) && s.CourseID == team.CourseId).Select(t => new { t.Name, t.Id }).ToList();
+                if (teamfound.Count > 0)
                     return Json(new { state = false, msg = "Team Name is already founded" });
                 DB.Teams.Add(new TeamModel()
                 {
@@ -36,16 +36,16 @@ namespace Graduate_Project_BackEnd.Controllers
                     LeaderID = std.Id,
                 });
                 DB.SaveChanges();
-                teamfound = DB.Teams.SingleOrDefault(s => s.Name.Equals(team.TeamName));
+                teamfound = DB.Teams.Where(s => s.Name.Equals(team.TeamName) && s.CourseID == team.CourseId).Select(t => new { t.Name, t.Id }).ToList();
                 DB.Projects.Add(new ProjectModel()
                 {
                     Name = team.ProName,
                     Desciption = team.ProDescription,
-                    TeamID = teamfound.Id,
+                    TeamID = teamfound[0].Id,
                 });
                 DB.SaveChanges();
 
-                courseStudent.TeamID = teamfound.Id;
+                courseStudent.TeamID = teamfound[0].Id;
                 DB.Courses_Students.Update(courseStudent);
                 DB.SaveChanges();
                 return Json(new { state = true, msg = "Added Successfully" });
@@ -63,7 +63,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 var std_course = DB.Courses_Students.SingleOrDefault(cs => cs.CourseID == course.Id && cs.StudentID == std.Id);
                 if (std_course != null)
                 {
-                    var teams = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new {cs.TeamID,cs.Team.Name,leader = cs.Student.Name }).ToList();
+                    var teams = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new { cs.TeamID, cs.Team.Name, leader = cs.Student.Name }).ToList();
                     return Json(new { state = true, msg = "Success", data = teams });
                 }
                 return Json(new { state = false, msg = "failed" });
