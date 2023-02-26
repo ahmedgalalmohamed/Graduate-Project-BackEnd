@@ -65,6 +65,12 @@ namespace apifirstproject1.Migrations
                     b.Property<bool>("IsGraduate")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MaxStd")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinStd")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -225,6 +231,36 @@ namespace apifirstproject1.Migrations
                     b.ToTable("Proffessors");
                 });
 
+            modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProfNotificationsModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsReaded")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProfId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfId");
+
+                    b.ToTable("profNotifications");
+                });
+
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProjectModel", b =>
                 {
                     b.Property<int>("Id")
@@ -338,12 +374,6 @@ namespace apifirstproject1.Migrations
                     b.Property<int>("LeaderID")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxStd")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MinStd")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -411,6 +441,17 @@ namespace apifirstproject1.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProfNotificationsModel", b =>
+                {
+                    b.HasOne("Graduate_Project_BackEnd.Models.ProffessorModel", "professor")
+                        .WithMany("Notifications")
+                        .HasForeignKey("ProfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("professor");
+                });
+
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProjectModel", b =>
                 {
                     b.HasOne("Graduate_Project_BackEnd.Models.TeamModel", "Team")
@@ -474,6 +515,8 @@ namespace apifirstproject1.Migrations
 
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProffessorModel", b =>
                 {
+                    b.Navigation("Notifications");
+
                     b.Navigation("Teams");
                 });
 
