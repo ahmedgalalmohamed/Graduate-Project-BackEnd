@@ -88,9 +88,9 @@ namespace Graduate_Project_BackEnd.Controllers
             if (currentUser == null)
             {
                 return Json(new { state = false, msg = "failed" });
-
             }
-
+            if (currentUser.Role.ToLower().Equals("proffessor"))
+                return RedirectToAction("getNotification", "Proffessor");
             var std = DB.Students.SingleOrDefault(s => s.Email.Equals(currentUser.Email));
             if (std == null)
                 return Json(new { state = false, msg = "failed to get student data" });
