@@ -60,14 +60,28 @@ namespace Graduate_Project_BackEnd.Controllers
                         var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
                         if (notifications.Count == 0)
                         {
-                            DB.Notifications.Add(new NotificationModel()
+                            if (notification.Content.ToLower().Contains("team"))
                             {
-                                SenderId = notification.SenderId,
-                                StudentId = team[0].LeaderID,
-                                TeamId = notification.TeamId,
-                                Content = "Request " + notification.Content,
-                                SenderRole = currentUser.Role,
-                            });
+                                DB.Notifications.Add(new NotificationModel()
+                                {
+                                    SenderId = notification.SenderId,
+                                    StudentId = team[0].LeaderID,
+                                    TeamId = notification.TeamId,
+                                    Content = "Request " + notification.Content,
+                                    SenderRole = currentUser.Role,
+                                });
+                            }
+                            else
+                            {
+                                DB.Notifications.Add(new NotificationModel()
+                                {
+                                    SenderId = notification.SenderId,
+                                    StudentId = (int)notification.StudentId,
+                                    TeamId = notification.TeamId,
+                                    Content = "Request " + notification.Content,
+                                    SenderRole = currentUser.Role,
+                                });
+                            }
                             DB.SaveChanges();
                             return getNotification();
                         }
