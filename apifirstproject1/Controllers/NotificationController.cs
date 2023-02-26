@@ -213,7 +213,7 @@ namespace Graduate_Project_BackEnd.Controllers
             DB.SaveChanges();
             var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
             var std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == currentUser.Id && s.CourseID == team[0].CourseID);
-            if (std != null && std.TeamID != null)
+            if (std != null && std.TeamID == null)
             {
                 NotificationModel newNotification = new NotificationModel()
                 {
