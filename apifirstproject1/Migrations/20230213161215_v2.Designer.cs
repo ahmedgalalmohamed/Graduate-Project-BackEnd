@@ -4,6 +4,7 @@ using Graduate_Project_BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace apifirstproject1.Migrations
 {
     [DbContext(typeof(DBCONTEXT))]
-    partial class DBCONTEXTModelSnapshot : ModelSnapshot
+    [Migration("20230213161215_v2")]
+    partial class v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,40 +144,6 @@ namespace apifirstproject1.Migrations
                     b.ToTable("Instructors");
                 });
 
-            modelBuilder.Entity("Graduate_Project_BackEnd.Models.NotificationModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsReaded")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SenderRole")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProffessorModel", b =>
                 {
                     b.Property<int>("Id")
@@ -249,27 +217,6 @@ namespace apifirstproject1.Migrations
                     b.HasIndex("TeamID");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("Graduate_Project_BackEnd.Models.SkilsModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("StudentID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("skil")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentID");
-
-                    b.ToTable("Skils");
                 });
 
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.StudentsModel", b =>
@@ -400,17 +347,6 @@ namespace apifirstproject1.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Graduate_Project_BackEnd.Models.NotificationModel", b =>
-                {
-                    b.HasOne("Graduate_Project_BackEnd.Models.StudentsModel", "Student")
-                        .WithMany("Notifications")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.ProjectModel", b =>
                 {
                     b.HasOne("Graduate_Project_BackEnd.Models.TeamModel", "Team")
@@ -420,17 +356,6 @@ namespace apifirstproject1.Migrations
                         .IsRequired();
 
                     b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Graduate_Project_BackEnd.Models.SkilsModel", b =>
-                {
-                    b.HasOne("Graduate_Project_BackEnd.Models.StudentsModel", "Student")
-                        .WithMany("Skils")
-                        .HasForeignKey("StudentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.TeamModel", b =>
@@ -480,10 +405,6 @@ namespace apifirstproject1.Migrations
             modelBuilder.Entity("Graduate_Project_BackEnd.Models.StudentsModel", b =>
                 {
                     b.Navigation("Courses");
-
-                    b.Navigation("Notifications");
-
-                    b.Navigation("Skils");
 
                     b.Navigation("TeamLeader");
                 });
