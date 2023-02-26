@@ -182,7 +182,7 @@ namespace apifirstproject1.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LeaderID = table.Column<int>(type: "int", nullable: false),
                     CourseID = table.Column<int>(type: "int", nullable: false),
-                    ProfID = table.Column<int>(type: "int", nullable: false),
+                    ProfID = table.Column<int>(type: "int", nullable: true),
                     IsComplete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
