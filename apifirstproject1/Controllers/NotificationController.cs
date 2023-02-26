@@ -46,7 +46,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Id == notification.SenderId)
             {
-                var team = DB.Teams.Where(t => t.Id == notification.TeamId && t.CourseID == notification.CourseId).Select(t => new { t.LeaderID }).ToList();
+                var team = DB.Teams.Where(t => t.Id == notification.TeamId && t.CourseID == notification.CourseId).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
                 if (team.Count > 0)
                 {
                     var course_std = DB.Courses_Students.SingleOrDefault(cs => cs.Student.Email == currentUser.Email && cs.CourseID == notification.CourseId && cs.TeamID == null);
@@ -55,7 +55,9 @@ namespace Graduate_Project_BackEnd.Controllers
                         var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
                         if (std == null)
                             return Json(new { state = false, msg = "failed to send request" });
-                        var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Equals("Request")).ToList();
+                        if (setComplete(notification.TeamId))
+                            return Json(new { state = false, msg = "Team is Complete" });
+                        var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
                         if (notifications.Count == 0)
                         {
                             DB.Notifications.Add(new NotificationModel()
@@ -63,7 +65,7 @@ namespace Graduate_Project_BackEnd.Controllers
                                 SenderId = notification.SenderId,
                                 StudentId = team[0].LeaderID,
                                 TeamId = notification.TeamId,
-                                Content = "Request",
+                                Content = "Request " + notification.Content,
                                 SenderRole = currentUser.Role,
                             });
                             DB.SaveChanges();
@@ -124,7 +126,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 Cluster = "eu",
                 Encrypted = true,
             });
-            await pusher.TriggerAsync("my-channel", "my-event",new{});
+            await pusher.TriggerAsync("my-channel", "my-event", new { });
         }
 
         #region  team leader respond to request
@@ -137,44 +139,115 @@ namespace Graduate_Project_BackEnd.Controllers
                 return Json(new { state = false, msg = "failed" });
             }
             var notification = DB.Notifications.SingleOrDefault(n => n.Student.Email.Equals(currentUser.Email) && n.Id == n_id);
-            if (notification != null)
+            if (notification != null && notification.Content.ToLower().Contains("request"))
             {
-                notification.IsReaded = true;
-                DB.Notifications.Update(notification);
-                DB.SaveChanges();
-                var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
-                if (std != null)
-                {
-                    NotificationModel newNotification = new NotificationModel()
-                    {
-                        SenderId = (int)currentUser.Id,
-                        StudentId = std.Id,
-                        TeamId = notification.TeamId,
-                        Content = accept ? "Accepted" : "Rejected",
-                        SenderRole = currentUser.Role,
-                    };
-                    DB.Notifications.Add(newNotification);
-                    DB.SaveChanges();
-                    if (accept)
-                    {
-                        var team = DB.Teams.Where(t => t.Id == notification.TeamId).Select(t => t.CourseID).ToList();
-                        if (team.Count > 0)
-                        {
-                            var cour_Std = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == std.Id && cs.CourseID == team[0]);
-                            if (cour_Std != null)
-                            {
-                                cour_Std.TeamID = notification.TeamId;
-                                DB.Courses_Students.Update(cour_Std);
-                                DB.SaveChanges();
-                            }
-                        }
-                    }
-                }
-                return getNotification();
+                var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+                if (team.Count == 0)
+                    return Json(new { state = false, msg = "Team is Complete or not found" });
+                if (notification.Content.ToLower().Contains("student"))
+                    StudentRespond(currentUser, notification, accept);
+                else
+                    TeamRespond(currentUser, notification, accept);
             }
             return Json(new { state = false, msg = "Failed" });
         }
 
+        private IActionResult TeamRespond(UserLoginVM currentUser, NotificationModel notification, bool accept)
+        {
+            notification.IsReaded = true;
+            DB.Notifications.Update(notification);
+            DB.SaveChanges();
+            var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
+            if (std != null)
+            {
+                NotificationModel newNotification = new NotificationModel()
+                {
+                    SenderId = (int)currentUser.Id,
+                    StudentId = std.Id,
+                    TeamId = notification.TeamId,
+                    Content = accept ? "Accepted" : "Rejected",
+                    SenderRole = currentUser.Role,
+                };
+                DB.Notifications.Add(newNotification);
+                DB.SaveChanges();
+                if (accept)
+                {
+                    var team = DB.Teams.Where(t => t.Id == notification.TeamId).Select(t => t.CourseID).ToList();
+                    if (team.Count > 0)
+                    {
+                        if (setComplete(notification.TeamId))
+                            return Json(new { state = false, msg = "Team is Complete" });
+                        var cour_Std = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == std.Id && cs.CourseID == team[0]);
+                        if (cour_Std != null)
+                        {
+                            cour_Std.TeamID = notification.TeamId;
+                            DB.Courses_Students.Update(cour_Std);
+                            DB.SaveChanges();
+                        }
+                    }
+                    if (setComplete(notification.TeamId))
+                        return Json(new { state = false, msg = "Team is Complete" });
+                }
+            }
+            return getNotification();
+        }
+        private IActionResult StudentRespond(UserLoginVM currentUser, NotificationModel notification, bool accept)
+        {
+            notification.IsReaded = true;
+            DB.Notifications.Update(notification);
+            DB.SaveChanges();
+            var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+            var std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == notification.SenderId && s.CourseID == team[0].CourseID);
+            if (std != null && std.TeamID != null)
+            {
+                NotificationModel newNotification = new NotificationModel()
+                {
+                    SenderId = (int)currentUser.Id,
+                    StudentId = std.StudentID,
+                    TeamId = notification.TeamId,
+                    Content = accept ? "Accepted" : "Rejected",
+                    SenderRole = currentUser.Role,
+                };
+                DB.Notifications.Add(newNotification);
+                DB.SaveChanges();
+                if (accept)
+                {
+                    if (setComplete(notification.TeamId))
+                        return Json(new { state = false, msg = "Team is Complete" });
+                    std.TeamID = team[0].Id;
+                    DB.Courses_Students.Update(std);
+                    DB.SaveChanges();
+                    if (setComplete(notification.TeamId))
+                        return Json(new { state = false, msg = "Team is Complete" });
+                }
+            }
+
+            return getNotification();
+        }
+
+        private bool setComplete(int t_id)
+        {
+            var team = DB.Teams.Where(t => t.Id == t_id && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+            var members = DB.Courses_Students.Where(cs => cs.TeamID == team[0].Id).ToList();
+            var course = DB.Courses.SingleOrDefault(c => c.Id == team[0].Id);
+            if (members.Count == course.MaxStd)
+            {
+                if (!team[0].IsComplete)
+                {
+                    DB.Teams.Update(new TeamModel()
+                    {
+                        Id = team[0].Id,
+                        Name = team[0].Name,
+                        CourseID = team[0].CourseID,
+                        LeaderID = team[0].LeaderID,
+                        IsComplete = true,
+                    });
+                    DB.SaveChanges();
+                }
+                return true;
+            }
+            return false;
+        }
         #endregion
 
         #region        User delete notification

@@ -14,13 +14,15 @@ namespace Graduate_Project_BackEnd.Models
         public DbSet<CourseModel> Courses { get; set; }
         public DbSet<Courses_StudentsModel> Courses_Students { get; set; }
         public DbSet<NotificationModel> Notifications { get; set; }
+        public DbSet<ProfNotificationsModel> profNotifications { get; set; }
         //public DbSet<StudentTeamModel> Students_Teams { get; set; }
         public DbSet<SkilsModel> Skils { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.;Database=TMS1;User Id=sa;Password=12345;");
+            optionsBuilder.UseSqlServer(@"Server=.;Database=TMS2;User Id=sa;Password=12345;");
+
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -50,6 +52,7 @@ namespace Graduate_Project_BackEnd.Models
             modelBuilder.Entity<Courses_StudentsModel>().HasOne<TeamModel>(cs => cs.Team).WithMany(t => t.Courses_Students).HasForeignKey(cs => cs.TeamID).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<NotificationModel>().HasOne<StudentsModel>(n => n.Student).WithMany(s => s.Notifications).HasForeignKey(n => n.StudentId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<SkilsModel>().HasOne<StudentsModel>(sk => sk.Student).WithMany(s => s.Skils).HasForeignKey(sk => sk.StudentID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProfNotificationsModel>().HasOne<ProffessorModel>(n => n.professor).WithMany(s => s.Notifications).HasForeignKey(n => n.ProfId).OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }
