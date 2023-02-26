@@ -47,7 +47,7 @@ namespace Graduate_Project_BackEnd.Controllers
             if (currentUser.Id == notification.SenderId)
             {
                 var team = DB.Teams.Where(t => t.Id == notification.TeamId && t.CourseID == notification.CourseId).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
-                if (team.Count > 0 && team[0].LeaderID == currentUser.Id)
+                if (team.Count > 0)
                 {
                     var course_std = DB.Courses_Students.SingleOrDefault(cs => cs.Student.Email == currentUser.Email && cs.CourseID == notification.CourseId);
                     if (course_std != null)
@@ -73,7 +73,7 @@ namespace Graduate_Project_BackEnd.Controllers
                                     SenderRole = currentUser.Role,
                                 });
                             }
-                            else
+                            else if(team[0].LeaderID == currentUser.Id)
                             {
                                 DB.Notifications.Add(new NotificationModel()
                                 {

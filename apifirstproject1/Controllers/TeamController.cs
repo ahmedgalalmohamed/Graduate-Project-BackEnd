@@ -63,7 +63,9 @@ namespace Graduate_Project_BackEnd.Controllers
                 var std_course = DB.Courses_Students.SingleOrDefault(cs => cs.CourseID == course.Id && cs.StudentID == std.Id);
                 if (std_course != null)
                 {
-                    var teams = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new { cs.TeamID, cs.Team.Name, leader = cs.Student.Name }).ToList();
+                    var teams = DB.Teams.Where(t => t.CourseID == course.Id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { TeamID= t.Id, t.Name, leader = DB.Students.SingleOrDefault(s=>s.Id == t.LeaderID).Name });
+                        
+                        //DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new { cs.TeamID, cs.Team.Name, leader = cs.Student.Name }).ToList();
                     return Json(new { state = true, msg = "Success", data = teams });
                 }
                 return Json(new { state = false, msg = "failed" });
