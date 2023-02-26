@@ -62,7 +62,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 List<int> courses = new List<int>();
                 foreach (var cour in cour_std)
                     courses.Add((int)cour.CourseID);
-                StudentVM.Add(new StudentVM() { Name = std.Name, Email = std.Email, Semester = std.Semester, CoursesID = courses,Password =std.Password });
+                StudentVM.Add(new StudentVM() { Name = std.Name, Email = std.Email, Semester = std.Semester, CoursesID = courses, Password = std.Password });
             }
             return Json(new { state = true, msg = "Success", data = StudentVM });
         }
@@ -144,10 +144,15 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpPost]
         public IActionResult GetAvailableStudents([FromForm] int id)
         {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null || currentUser.Id == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
             var course = DB.Courses.SingleOrDefault(c => c.Id == id);
             if (course != null)
             {
-                var std_course = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.TeamID == null).Select(cs => new { cs.StudentID, cs.Student.Name, cs.Student.Email });
+                var std_course = DB.Courses_Students.Where(cs => cs.StudentID != currentUser.Id && cs.CourseID == course.Id && cs.TeamID == null).Select(cs => new { cs.StudentID, cs.Student.Name, cs.Student.Email });
                 if (std_course != null)
                 {
                     return Json(new { state = true, msg = "Success", data = std_course });

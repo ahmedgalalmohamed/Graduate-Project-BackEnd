@@ -60,10 +60,10 @@ namespace Graduate_Project_BackEnd.Controllers
                         var notifications = DB.Notifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
                         if (notifications.Count == 0)
                         {
-                            if (course_std.TeamID != null)
-                                return Json(new { state = false, msg = "You are already in team" });
                             if (notification.Content.ToLower().Contains("team"))
                             {
+                                if (course_std.TeamID != null)
+                                    return Json(new { state = false, msg = "You are already in team" });
                                 DB.Notifications.Add(new NotificationModel()
                                 {
                                     SenderId = notification.SenderId,
