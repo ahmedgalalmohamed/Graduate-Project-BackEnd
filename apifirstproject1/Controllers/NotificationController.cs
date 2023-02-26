@@ -243,7 +243,7 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             var team = DB.Teams.Where(t => t.Id == t_id && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
             var members = DB.Courses_Students.Where(cs => cs.TeamID == team[0].Id).ToList();
-            var course = DB.Courses.SingleOrDefault(c => c.Id == team[0].Id);
+            var course = DB.Courses.SingleOrDefault(c => c.Id == team[0].CourseID);
             if (members.Count == course.MaxStd)
             {
                 if (!team[0].IsComplete)
