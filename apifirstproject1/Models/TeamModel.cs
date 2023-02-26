@@ -12,8 +12,7 @@
 
         public ProffessorModel Prof { get; set; }
         public int? ProfID { get; set; }
-        public int MinStd { get; set; } = 3;
-        public int MaxStd { get; set; } = 5;
+        
         public bool IsComplete { get; set; } = false;
 
         public ICollection<Courses_StudentsModel> Courses_Students { get; set; }
