@@ -18,7 +18,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpGet]
         public IActionResult Display()
         {
-            var Instructors = DB.Instructors.ToList();
+            var Instructors = DB.Instructors.OrderBy(i => i.Name).ToList();
             if (Instructors != null)
                 return Json(new { state = true, msg = "Success", data = Instructors });
             return Json(new { state = false, msg = "failed", data = Instructors });

@@ -42,7 +42,7 @@ namespace Graduate_Project_BackEnd.Controllers
         public IActionResult Display()
         {
 
-            var Courses = DB.Courses.ToList();
+            var Courses = DB.Courses.OrderBy(c => c.Name).ToList();
             if (Courses != null)
                 return Json(new { state = true, msg = "Success", data = Courses });
             return Json(new { state = false, msg = "failed", data = Courses });
@@ -55,7 +55,7 @@ namespace Graduate_Project_BackEnd.Controllers
             var std = DB.Students.SingleOrDefault(s => s.Email.Equals(email));
             if (std != null)
             {
-                var Courses = DB.Courses_Students.Where(cs => cs.StudentID == std.Id).Include(c => c.Course).Select(cs => new { cs.Course.Id, cs.Course.Name, cs.Course.Desciption }).ToList();
+                var Courses = DB.Courses_Students.Where(cs => cs.StudentID == std.Id).Include(c => c.Course).Select(cs => new { cs.Course.Id, cs.Course.Name, cs.Course.Desciption }).OrderBy(c => c.Name).ToList();
                 return Json(new { state = true, msg = "Success", data = Courses });
             }
             return Json(new { state = false, msg = "failed" });

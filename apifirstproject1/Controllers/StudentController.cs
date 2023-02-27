@@ -54,7 +54,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpGet]
         public IActionResult Display()
         {
-            var Students = DB.Students.Include(s => s.Courses).ToList();
+            var Students = DB.Students.Include(s => s.Courses).OrderBy(s => s.Name).ToList();
             List<StudentVM> StudentVM = new List<StudentVM>();
             foreach (var std in Students)
             {

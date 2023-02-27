@@ -19,7 +19,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpGet]
         public IActionResult Display()
         {
-            var Proffessors = DB.Proffessors.ToList();
+            var Proffessors = DB.Proffessors.OrderBy(p => p.Name).ToList();
             if (Proffessors != null)
                 return Json(new { state = true, msg = "Success", data = Proffessors });
             return Json(new { state = false, msg = "failed", data = Proffessors });
