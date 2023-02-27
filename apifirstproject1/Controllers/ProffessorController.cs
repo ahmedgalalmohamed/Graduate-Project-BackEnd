@@ -133,6 +133,12 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Id == notification.SenderId)
             {
+                var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
+                if (prof == null)
+                    return Json(new { state = false, msg = "Professor not found" });
+                var teamCount = DB.Teams.Where(p => p.ProfID == notification.ProfId).Select(t => t.Id).Count();
+                if (teamCount >= prof.TeamCount)
+                    return Json(new { state = false, msg = "Teams is complete" });
                 var team = DB.Teams.Where(t => t.Id == notification.TeamId).Select(t => new { t.LeaderID }).ToList();
                 if (team.Count > 0)
                 {
@@ -141,7 +147,6 @@ namespace Graduate_Project_BackEnd.Controllers
                         return Json(new { state = false, msg = "failed to send request" });
                     var notifications = DB.profNotifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
                     var stdnotific = DB.profNotifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.ProfId == notification.ProfId && n.Content.ToLower().Contains("request")).ToList();
-
                     if (notifications.Count == 0 || (team[0].LeaderID == currentUser.Id && stdnotific.Count == 0))
                     {
                         DB.profNotifications.Add(new ProfNotificationsModel()
@@ -168,11 +173,10 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var prof = DB.Proffessors.SingleOrDefault(s => s.Email.Equals(currentUser.Email));
+            var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
             if (prof == null)
                 return Json(new { state = false, msg = "failed to get Professor data" });
             var notifications = DB.profNotifications.Where(n => n.ProfId == prof.Id && n.IsReaded == false).Select(n => new { n.Id, n.SenderId, n.Content, n.TeamId }).ToList();
-
             List<NotificationVM> senders = new List<NotificationVM>();
             foreach (var notification in notifications)
             {
@@ -210,17 +214,20 @@ namespace Graduate_Project_BackEnd.Controllers
                 var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
                 if (std != null)
                 {
+                    var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
+                    var teamCount = DB.Teams.Where(p => p.ProfID == currentUser.Id).Select(t => t.Id).ToList().Count();
+
                     NotificationModel newNotification = new NotificationModel()
                     {
                         SenderId = (int)currentUser.Id,
                         StudentId = std.Id,
                         TeamId = notification.TeamId,
-                        Content = accept ? "Accepted" : "Rejected",
+                        Content = (!accept || teamCount >= prof.TeamCount) ? "Rejected" : "Accepted",
                         SenderRole = currentUser.Role,
                     };
                     DB.Notifications.Add(newNotification);
                     DB.SaveChanges();
-                    if (accept)
+                    if (accept && teamCount < prof.TeamCount)
                     {
                         DB.Teams.Update(new TeamModel()
                         {
