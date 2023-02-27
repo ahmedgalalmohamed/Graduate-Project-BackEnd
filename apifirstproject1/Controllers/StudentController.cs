@@ -115,12 +115,12 @@ namespace Graduate_Project_BackEnd.Controllers
             while (reader.Peek() >= 0)
             {
                 var std = (reader.ReadLine()).Split(',').ToList();
-                var found = DB.Students.SingleOrDefault(s => s.Email.Equals(std[header.IndexOf("Email")]));
+                var found = DB.Students.SingleOrDefault(s => s.Email.Equals(std[header.IndexOf("email")]));
                 if (found == null)
                 {
                     students.Add(std[header.IndexOf("email")]);
-                    courses.Add(std[header.IndexOf("course")]);
-                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("passeord")], Semester = int.Parse(std[header.IndexOf("semester")]) });
+                    courses.Add(std[header.IndexOf("courses")]);
+                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("password")], Semester = int.Parse(std[header.IndexOf("semester")]) });
                     DB.SaveChanges();
                 }
             }

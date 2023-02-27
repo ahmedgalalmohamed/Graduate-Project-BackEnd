@@ -71,10 +71,10 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             int cnt = 0;
             var reader = new StreamReader(readexcel.OpenReadStream());
-            var header = (reader.ReadLine()).Split(',').ToList();
+            var header = (reader.ReadLine().ToLower()).Split(',').ToList();
             while (reader.Peek() >= 0)
             {
-                var prof = (reader.ReadLine().ToLower()).Split(',').ToList();
+                var prof = (reader.ReadLine()).Split(',').ToList();
                 var found = DB.Instructors.SingleOrDefault(s => s.Email.Equals(prof[header.IndexOf("email")]));
                 if (found == null)
                 {
