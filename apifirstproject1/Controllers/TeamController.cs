@@ -72,7 +72,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { state = false, msg = "failed" });
         }
-        [Authorize(Roles = "student")]
+        [Authorize(Roles = "student,proffessor")]
         [HttpPost]
         public IActionResult getMyTeam([FromForm] int id)
         {
