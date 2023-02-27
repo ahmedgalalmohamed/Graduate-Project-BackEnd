@@ -187,11 +187,12 @@ namespace Graduate_Project_BackEnd.Controllers
                     SenderEmail = tmp[0].Email,
                     Id = notification.Id,
                     Content = notification.Content,
-                    SenderId = notification.SenderId
+                    SenderId = notification.SenderId,
+                    SenderRole = "student",
                 });
             }
 
-            return Json(new { state = true, msg = "Success", data = new { senders, count = senders.Count } });
+            return Json(new { state = true, msg = "Success", data = new { senders, count = senders.Count  } });
         }
 
         [HttpPost]
