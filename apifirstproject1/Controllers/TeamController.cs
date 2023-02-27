@@ -78,6 +78,23 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpPost]
         public IActionResult getMyTeam([FromForm] int id)
         {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            if (currentUser.Role.Equals("student"))
+            {
+                var cour_std = DB.Courses_Students.SingleOrDefault(s => s.TeamID == id && s.StudentID == currentUser.Id);
+                if (cour_std == null)
+                    return Json(new { state = false, msg = "Failed to get data" });
+            }
+            else if (currentUser.Role.Equals("proffessor"))
+            {
+                var team = DB.Teams.Where(t => t.Id == id && t.ProfID == currentUser.Id).Select(t => t.Id).ToList();
+                if (team.Count == 0)
+                    return Json(new { state = false, msg = "Failed to get data" });
+            }
             var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Include(t => t.Team).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
             var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
             if (members != null)
