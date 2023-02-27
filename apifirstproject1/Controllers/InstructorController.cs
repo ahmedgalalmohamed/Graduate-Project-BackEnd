@@ -74,12 +74,12 @@ namespace Graduate_Project_BackEnd.Controllers
             var header = (reader.ReadLine()).Split(',').ToList();
             while (reader.Peek() >= 0)
             {
-                var prof = (reader.ReadLine()).Split(',').ToList();
-                var found = DB.Instructors.SingleOrDefault(s => s.Email.Equals(prof[header.IndexOf("Email")]));
+                var prof = (reader.ReadLine().ToLower()).Split(',').ToList();
+                var found = DB.Instructors.SingleOrDefault(s => s.Email.Equals(prof[header.IndexOf("email")]));
                 if (found == null)
                 {
                     cnt++;
-                    DB.Instructors.Add(new InstructorModel() { Name = prof[header.IndexOf("Name")], Email = prof[header.IndexOf("Email")], Password = prof[header.IndexOf("Password")] });
+                    DB.Instructors.Add(new InstructorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")] });
                     DB.SaveChanges();
                 }
             }

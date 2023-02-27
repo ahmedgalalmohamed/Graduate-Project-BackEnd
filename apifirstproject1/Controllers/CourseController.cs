@@ -151,17 +151,17 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             int cnt = 0;
             var reader = new StreamReader(readexcel.OpenReadStream());
-            var header = (reader.ReadLine()).Split(',').ToList();
+            var header = (reader.ReadLine().ToLower()).Split(',').ToList();
             while (reader.Peek() >= 0)
             {
                 var course = (reader.ReadLine()).Split(',').ToList();
-                var found = DB.Courses.SingleOrDefault(s => s.Name.Equals(course[header.IndexOf("Name")]));
+                var found = DB.Courses.SingleOrDefault(s => s.Name.Equals(course[header.IndexOf("name")]));
                 if (found == null)
                 {
-                    var instructor = DB.Instructors.SingleOrDefault(i => i.Email.Equals(course[header.IndexOf("Instructor")]));
+                    var instructor = DB.Instructors.SingleOrDefault(i => i.Email.Equals(course[header.IndexOf("instructor")]));
                     if (instructor != null)
                     {
-                        DB.Courses.Add(new CourseModel() { Name = course[header.IndexOf("Name")], Desciption = course[header.IndexOf("Desciption")], InstructorID = instructor.Id, IsGraduate = bool.Parse(course[header.IndexOf("IsGraduate")]) });
+                        DB.Courses.Add(new CourseModel() { Name = course[header.IndexOf("name")], Desciption = course[header.IndexOf("description")], InstructorID = instructor.Id, IsGraduate = bool.Parse(course[header.IndexOf("isgraduate")]) });
                         DB.SaveChanges();
                         cnt++;
                     }

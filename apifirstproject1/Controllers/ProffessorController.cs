@@ -68,15 +68,15 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             int cnt = 0;
             var reader = new StreamReader(readexcel.OpenReadStream());
-            var header = (reader.ReadLine()).Split(',').ToList();
+            var header = (reader.ReadLine().ToLower()).Split(',').ToList();
             while (reader.Peek() >= 0)
             {
                 var prof = (reader.ReadLine()).Split(',').ToList();
-                var found = DB.Proffessors.SingleOrDefault(s => s.Email.Equals(prof[header.IndexOf("Email")]));
+                var found = DB.Proffessors.SingleOrDefault(s => s.Email.Equals(prof[header.IndexOf("email")]));
                 if (found == null)
                 {
                     cnt++;
-                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("Name")], Email = prof[header.IndexOf("Email")], Password = prof[header.IndexOf("Password")] });
+                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")] });
                     DB.SaveChanges();
                 }
             }
