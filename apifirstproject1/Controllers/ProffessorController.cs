@@ -140,7 +140,9 @@ namespace Graduate_Project_BackEnd.Controllers
                     if (std == null)
                         return Json(new { state = false, msg = "failed to send request" });
                     var notifications = DB.profNotifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.Content.Contains("Request")).ToList();
-                    if (notifications.Count == 0)
+                    var stdnotific = DB.profNotifications.Where(n => n.TeamId == notification.TeamId && n.SenderId == currentUser.Id && n.ProfId == notification.ProfId && n.Content.ToLower().Contains("request")).ToList();
+
+                    if (notifications.Count == 0 || (team[0].LeaderID == currentUser.Id && stdnotific.Count == 0))
                     {
                         DB.profNotifications.Add(new ProfNotificationsModel()
                         {
