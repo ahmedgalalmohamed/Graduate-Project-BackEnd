@@ -3,6 +3,8 @@ using Graduate_Project_BackEnd.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+
 namespace Graduate_Project_BackEnd.Controllers
 {
     [Route("[controller]/[action]")]
@@ -63,9 +65,9 @@ namespace Graduate_Project_BackEnd.Controllers
                 var std_course = DB.Courses_Students.SingleOrDefault(cs => cs.CourseID == course.Id && cs.StudentID == std.Id);
                 if (std_course != null)
                 {
-                    var teams = DB.Teams.Where(t => t.CourseID == course.Id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { TeamID= t.Id, t.Name, leader = DB.Students.SingleOrDefault(s=>s.Id == t.LeaderID).Name });
-                        
-                        //DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new { cs.TeamID, cs.Team.Name, leader = cs.Student.Name }).ToList();
+                    var teams = DB.Teams.Where(t => t.CourseID == course.Id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { TeamID = t.Id, t.Name, leader = DB.Students.SingleOrDefault(s => s.Id == t.LeaderID).Name });
+
+                    //DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.Team.IsComplete == false && cs.TeamID != std_course.TeamID && cs.StudentID == cs.Team.LeaderID).Select(cs => new { cs.TeamID, cs.Team.Name, leader = cs.Student.Name }).ToList();
                     return Json(new { state = true, msg = "Success", data = teams });
                 }
                 return Json(new { state = false, msg = "failed" });
@@ -76,8 +78,8 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpPost]
         public IActionResult getMyTeam([FromForm] int id)
         {
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Include(t => t.Team).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email });
-            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email });
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Include(t => t.Team).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
+            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
             if (members != null)
             {
                 return Json(new { state = true, msg = "Success", data = new { leader, members } });
@@ -85,5 +87,49 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "Failed to get data" });
         }
 
+        [Authorize(Roles = "student")]
+        [HttpPost]
+        public IActionResult leaveTeam([FromForm] int t_id, [FromForm] int id)
+        {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            if (currentUser.Id == id)
+            {
+                var team = DB.Teams.Where(t => t.Id == t_id).Select(t => new { t.Id, t.CourseID }).ToList();
+                if (team.Count > 0)
+                {
+                    var std = DB.Courses_Students.Single(s => s.StudentID == currentUser.Id && s.CourseID == team[0].CourseID);
+                    if (std == null)
+                        return Json(new { state = false, msg = "can not found student in this course" });
+                    std.TeamID = null;
+                    DB.Courses_Students.Update(std);
+                    DB.SaveChanges();
+                    return Json(new { state = true, msg = "Done" });
+                }
+            }
+            return Json(new { state = false, msg = "Failed to get data" });
+        }
+
+
+        private UserLoginVM GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+                return new UserLoginVM
+                {
+                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
+                    Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
+                };
+            }
+            return null;
+        }
     }
 }
