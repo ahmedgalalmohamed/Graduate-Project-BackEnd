@@ -124,6 +124,12 @@ namespace Graduate_Project_BackEnd.Controllers
                     std.TeamID = null;
                     DB.Courses_Students.Update(std);
                     DB.SaveChanges();
+                    var notifications = DB.Notifications.Where(n => n.TeamId == t_id && (n.SenderId == currentUser.Id || n.StudentId == currentUser.Id) && n.Content.ToLower().Contains("request")).ToList();
+                    if (notifications.Count > 0)
+                    {
+                        DB.Notifications.RemoveRange(notifications);
+                        DB.SaveChanges();
+                    }
                     return Json(new { state = true, msg = "Done" });
                 }
             }
