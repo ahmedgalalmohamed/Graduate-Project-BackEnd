@@ -91,7 +91,7 @@ namespace Graduate_Project_BackEnd.Controllers
                     var availableStd = DB.Courses_Students.Where(cs => cs.StudentID != currentUser.Id && cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
                     var availablePro = DB.Proffessors.Where(p => p.TeamCount > DB.Teams.Where(t => t.ProfID == p.Id).Select(t => t.Name).ToList().Count).ToList().Count;
 
-                    var myTeam = DB.Courses_Students.Where(cs => cs.StudentID == std.Id && cs.CourseID == course.Id && cs.TeamID != null).Select(t => new {t.TeamID,t.Team.LeaderID}).ToList();
+                    var myTeam = DB.Courses_Students.Where(cs => cs.StudentID == std.Id && cs.CourseID == course.Id && cs.TeamID != null).Select(t => new {t.TeamID,t.Team.LeaderID,t.Team.ProfID}).ToList();
                     CourseStudentVM studentVM = new()
                     {
                         AvailableTeams = availableTeams == null ? 0 : availableTeams.Count,
@@ -102,6 +102,7 @@ namespace Graduate_Project_BackEnd.Controllers
                         AvailableProffessors = availablePro,
                         Description = course.Desciption,
                         IsGraduate = course.IsGraduate,
+                        ProId = myTeam.Count == 0 ? null : myTeam[0].ProfID,
                     };
                     return Json(new { state = true, msg = "Success", data = studentVM });
                 }

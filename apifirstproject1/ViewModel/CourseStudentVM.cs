@@ -5,6 +5,7 @@
         public int AvailableTeams { get; set; }
         public int AvailableStudents { get; set; }
         public int? AvailableProffessors { get; set; }
+        public int? ProId { get; set; }
         public int? MyTeam { get; set; }
         public int? TeamLeader { get; set; }
         public string Name { get; set; }
