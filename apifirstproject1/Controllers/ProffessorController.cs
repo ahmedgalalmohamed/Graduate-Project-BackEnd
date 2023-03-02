@@ -138,7 +138,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Id == notification.SenderId)
             {
-                var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
+                var prof = DB.Proffessors.SingleOrDefault(s => s.Id == notification.ProfId);
                 if (prof == null)
                     return Json(new { state = false, msg = "Professor not found" });
                 var teamCount = DB.Teams.Where(p => p.ProfID == notification.ProfId).Select(t => t.Id).Count();
