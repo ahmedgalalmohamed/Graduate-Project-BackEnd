@@ -139,19 +139,23 @@ namespace Graduate_Project_BackEnd.Controllers
 
         private UserLoginVM GetCurrentUser()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity != null)
+            try
             {
-                var userClaims = identity.Claims;
-                return new UserLoginVM
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity != null)
                 {
-                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
-                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
-                    Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
-                };
+                    var userClaims = identity.Claims;
+                    return new UserLoginVM
+                    {
+                        Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                        Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                        Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
+                        Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
+                    };
+                }
             }
+            catch { return null; }
             return null;
         }
     }

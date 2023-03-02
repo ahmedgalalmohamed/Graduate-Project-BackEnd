@@ -57,18 +57,22 @@ namespace Graduate_Project_BackEnd.Controllers
         }
         private AdminModel GetCurrentUser()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity != null)
+            try
             {
-                var userClaims = identity.Claims;
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
 
-                return new AdminModel
+                if (identity != null)
                 {
-                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
-                };
+                    var userClaims = identity.Claims;
+
+                    return new AdminModel
+                    {
+                        Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                        Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                    };
+                }
             }
+            catch { return null; }
             return null;
         }
     }

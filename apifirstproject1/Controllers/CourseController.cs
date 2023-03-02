@@ -91,7 +91,7 @@ namespace Graduate_Project_BackEnd.Controllers
                     var availableStd = DB.Courses_Students.Where(cs => cs.StudentID != currentUser.Id && cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
                     var availablePro = DB.Proffessors.Where(p => p.TeamCount > DB.Teams.Where(t => t.ProfID == p.Id).Select(t => t.Name).ToList().Count).ToList().Count;
 
-                    var myTeam = DB.Courses_Students.Where(cs => cs.StudentID == std.Id && cs.CourseID == course.Id && cs.TeamID != null).Select(t => new {t.TeamID,t.Team.LeaderID,t.Team.ProfID}).ToList();
+                    var myTeam = DB.Courses_Students.Where(cs => cs.StudentID == std.Id && cs.CourseID == course.Id && cs.TeamID != null).Select(t => new { t.TeamID, t.Team.LeaderID, t.Team.ProfID }).ToList();
                     CourseStudentVM studentVM = new()
                     {
                         AvailableTeams = availableTeams == null ? 0 : availableTeams.Count,
@@ -172,19 +172,23 @@ namespace Graduate_Project_BackEnd.Controllers
         }
         private UserLoginVM GetCurrentUser()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity != null)
+            try
             {
-                var userClaims = identity.Claims;
-                return new UserLoginVM
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity != null)
                 {
-                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
-                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
-                    Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
-                };
+                    var userClaims = identity.Claims;
+                    return new UserLoginVM
+                    {
+                        Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                        Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                        Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
+                        Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
+                    };
+                }
             }
+            catch { return null; }
             return null;
         }
     }

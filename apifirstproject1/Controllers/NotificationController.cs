@@ -19,19 +19,23 @@ namespace Graduate_Project_BackEnd.Controllers
 
         private UserLoginVM GetCurrentUser()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity != null)
+            try
             {
-                var userClaims = identity.Claims;
-                return new UserLoginVM
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity != null)
                 {
-                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
-                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
-                    Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
-                };
+                    var userClaims = identity.Claims;
+                    return new UserLoginVM
+                    {
+                        Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                        Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                        Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
+                        Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
+                    };
+                }
             }
+            catch { return null; }
             return null;
         }
 
@@ -74,7 +78,7 @@ namespace Graduate_Project_BackEnd.Controllers
                                     SenderRole = currentUser.Role,
                                 });
                             }
-                            else if(team[0].LeaderID == currentUser.Id)
+                            else if (team[0].LeaderID == currentUser.Id)
                             {
                                 DB.Notifications.Add(new NotificationModel()
                                 {
@@ -142,7 +146,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 Cluster = "eu",
                 Encrypted = true,
             });
-            await pusher.TriggerAsync("my-channel", "my-event", new { });
+            await pusher.TriggerAsync("notify-user-sub", "notify-user-ev", new { });
         }
 
         #region  team leader respond to request
@@ -176,7 +180,7 @@ namespace Graduate_Project_BackEnd.Controllers
             var std = DB.Students.SingleOrDefault(s => s.Id == notification.SenderId);
             var team = DB.Teams.Where(t => t.Id == notification.TeamId && !t.IsComplete).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
             var cour_std = DB.Courses_Students.SingleOrDefault(s => s.StudentID == notification.SenderId && s.CourseID == team[0].CourseID);
-            if (std != null && cour_std !=null && cour_std.TeamID == null)
+            if (std != null && cour_std != null && cour_std.TeamID == null)
             {
                 NotificationModel newNotification = new NotificationModel()
                 {
