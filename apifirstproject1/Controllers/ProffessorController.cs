@@ -2,7 +2,7 @@
 using Graduate_Project_BackEnd.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
+using PusherServer;
 namespace Graduate_Project_BackEnd.Controllers
 {
     //[Authorize(Roles = "admin")]
@@ -199,7 +199,20 @@ namespace Graduate_Project_BackEnd.Controllers
 
             return Json(new { state = true, msg = "Success", data = new { senders, count = senders.Count } });
         }
-
+ [HttpGet]
+        public async void Pusher_notifiy()
+        {
+            var pusher = new Pusher(
+            "1555576",
+            "6b02096c815db94e569b",
+            "33153ac9dce2b548644e",
+            new PusherOptions
+            {
+                Cluster = "eu",
+                Encrypted = true,
+            });
+            await pusher.TriggerAsync("notify-prof-sub", "notify-prof-ev", new { });
+        }
         [HttpPost]
         public IActionResult notificationRespond([FromForm] int n_id, [FromForm] bool accept)
         {
