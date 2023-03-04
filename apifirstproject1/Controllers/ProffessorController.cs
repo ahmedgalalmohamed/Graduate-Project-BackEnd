@@ -88,7 +88,7 @@ namespace Graduate_Project_BackEnd.Controllers
         public IActionResult MyTeams()
         {
             var currentUser = GetCurrentUser();
-            if (currentUser == null || currentUser.Id == null)
+            if (currentUser == null || currentUser.Id == null || !currentUser.Role.Equals("proffessor"))
             {
                 return Json(new { state = false, msg = "failed" });
             }

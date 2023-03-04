@@ -98,9 +98,9 @@ namespace Graduate_Project_BackEnd.Controllers
             if (course != null)
             {
                 if (currentUser.Role.Equals("student"))
-                    GetStdCourse(id, currentUser);
+                    return(GetStdCourse(id, currentUser));
                 else
-                    GetInsCourse(id, currentUser);
+                    return(GetInsCourse(id, currentUser));
             }
             return Json(new { state = false, msg = "failed" });
         }
