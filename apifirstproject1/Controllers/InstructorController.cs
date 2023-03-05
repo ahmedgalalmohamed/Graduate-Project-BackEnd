@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace Graduate_Project_BackEnd.Controllers
 {
-    [Authorize(Roles = "admin")]
+    // [Authorize(Roles = "admin")]
     [Route("[controller]/[action]")]
     [ApiController]
     public class InstructorController : Controller
@@ -117,8 +117,9 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var ins_teams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.Id, t.Name, leader = t.Leader.Name }).ToList();
-            return Json(new { state = true, msg = "Success", data = ins_teams });
+            var teams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.Id, t.Name, leader = t.Leader.Name }).ToList();
+            var courseName=DB.Courses.SingleOrDefault(c=>c.Id == id).Name;
+            return Json(new { state = true, msg = "Success", data = new {teams,courseName} });
         }
     }
 }

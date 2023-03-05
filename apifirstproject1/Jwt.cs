@@ -20,7 +20,7 @@ namespace Graduate_Project_BackEnd
             var token = new JwtSecurityToken(configuration["Jwt:Issuer"],
              configuration["Jwt:Audience"],
              claims,
-             expires: DateTime.Now.AddMinutes(1),
+             expires: DateTime.Now.AddDays(1),
              signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
