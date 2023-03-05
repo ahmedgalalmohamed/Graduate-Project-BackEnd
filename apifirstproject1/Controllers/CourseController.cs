@@ -38,28 +38,42 @@ namespace Graduate_Project_BackEnd.Controllers
             DB.SaveChanges();
             return Json(new { state = true, msg = "Success" });
         }
-        [HttpGet]
+
+        //[HttpGet]
+        //public IActionResult Display()
+        //{
+        //    var Courses = DB.Courses.OrderBy(c => c.Name).ToList();
+        //    if (Courses != null)
+        //        return Json(new { state = true, msg = "Success", data = Courses });
+        //    return Json(new { state = false, msg = "failed", data = Courses });
+        //}
+
+        [Authorize(Roles = "student,instructor")]
+        [HttpPost]
         public IActionResult Display()
         {
-
-            var Courses = DB.Courses.OrderBy(c => c.Name).ToList();
-            if (Courses != null)
-                return Json(new { state = true, msg = "Success", data = Courses });
-            return Json(new { state = false, msg = "failed", data = Courses });
-        }
-        [Authorize(Roles = "student")]
-
-        [HttpPost]
-        public IActionResult Display([FromForm] string email)
-        {
-            var std = DB.Students.SingleOrDefault(s => s.Email.Equals(email));
-            if (std != null)
+            var currentUser = GetCurrentUser();
+            if (currentUser == null || currentUser.Id == null)
             {
-                var Courses = DB.Courses_Students.Where(cs => cs.StudentID == std.Id).Include(c => c.Course).Select(cs => new { cs.Course.Id, cs.Course.Name, cs.Course.Desciption }).OrderBy(c => c.Name).ToList();
-                return Json(new { state = true, msg = "Success", data = Courses });
+                return Json(new { state = false, msg = "failed" });
+            }
+            if (currentUser.Role.Equals("student"))
+            {
+                var std = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
+                if (std != null)
+                {
+                    var Courses = DB.Courses_Students.Where(cs => cs.StudentID == std.Id).Include(c => c.Course).Select(cs => new { cs.Course.Id, cs.Course.Name, cs.Course.Desciption }).OrderBy(c => c.Name).ToList();
+                    return Json(new { state = true, msg = "Success", data = Courses });
+                }
+            }
+            else
+            {
+                var courses = DB.Courses.Where(c => c.InstructorID == currentUser.Id).Select(c => new { c.Id, c.Name, c.Desciption }).OrderBy(c => c.Name).ToList();
+                return Json(new { state = true, msg = "Success", data = courses });
             }
             return Json(new { state = false, msg = "failed" });
         }
+
         [Authorize(Roles = "admin")]
         [HttpGet]
 
@@ -71,9 +85,9 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "failed", data = Courses });
         }
 
-        [Authorize(Roles = "student")]
+        [Authorize(Roles = "student,instructor")]
         [HttpPost]
-        public IActionResult GetCourse([FromForm] int id, [FromForm] string email)
+        public IActionResult GetCourse([FromForm] int id)
         {
             var currentUser = GetCurrentUser();
             if (currentUser == null || currentUser.Id == null)
@@ -81,13 +95,26 @@ namespace Graduate_Project_BackEnd.Controllers
                 return Json(new { state = false, msg = "failed" });
             }
             var course = DB.Courses.SingleOrDefault(c => c.Id == id);
-            var std = DB.Students.SingleOrDefault(s => s.Email.Equals(email));
+            if (course != null)
+            {
+                if (currentUser.Role.Equals("student"))
+                    return(GetStdCourse(id, currentUser));
+                else
+                    return(GetInsCourse(id, currentUser));
+            }
+            return Json(new { state = false, msg = "failed" });
+        }
+
+        private IActionResult GetStdCourse(int id, UserLoginVM currentUser)
+        {
+            var course = DB.Courses.SingleOrDefault(c => c.Id == id);
+            var std = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
             if (course != null && std != null)
             {
                 var std_course = DB.Courses_Students.SingleOrDefault(cs => cs.CourseID == course.Id && cs.StudentID == std.Id);
                 if (std_course != null)
                 {
-                    var availableTeams = DB.Teams.Where(t => t.CourseID == id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { t.CourseID }).ToList();
+                    var availableTeams = DB.Teams.Where(t => t.CourseID == id && !t.IsComplete && t.Id != std_course.TeamID).Select(t => new { t.CourseID, t.IsComplete }).ToList();
                     var availableStd = DB.Courses_Students.Where(cs => cs.StudentID != currentUser.Id && cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
                     var availablePro = DB.Proffessors.Where(p => p.TeamCount > DB.Teams.Where(t => t.ProfID == p.Id).Select(t => t.Name).ToList().Count).ToList().Count;
 
@@ -110,6 +137,30 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { state = false, msg = "failed" });
         }
+
+        private IActionResult GetInsCourse(int id, UserLoginVM currentUser)
+        {
+            var course = DB.Courses.SingleOrDefault(c => c.Id == id && c.InstructorID == currentUser.Id);
+            var ins = DB.Instructors.SingleOrDefault(i => i.Id == currentUser.Id);
+            if (course != null)
+            {
+                var availableTeams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.CourseID, t.IsComplete }).ToList();
+                var availableStd = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
+                CourseStudentVM studentVM = new()
+                {
+                    AvailableTeams = availableTeams == null ? 0 : availableTeams.Count,
+                    AvailableStudents = availableStd == null ? 0 : availableStd.Count,
+                    Name = course.Name,
+                    Description = course.Desciption,
+                    IsGraduate = course.IsGraduate,
+                    MinStd = course.MinStd,
+                    MaxStd = course.MaxStd,
+                };
+                return Json(new { state = true, msg = "Success", data = studentVM });
+            }
+            return Json(new { state = false, msg = "failed" });
+        }
+
 
         [Authorize(Roles = "admin")]
 
@@ -190,6 +241,28 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             catch { return null; }
             return null;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "instructor")]
+
+        public IActionResult InstructorEdit([FromForm] int id, [FromForm] int min, [FromForm] int max)
+        {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null || currentUser.Id == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            var course = DB.Courses.SingleOrDefault(c => c.Id == id && c.InstructorID == currentUser.Id);
+            if (course != null)
+            {
+                course.MinStd = min;
+                course.MaxStd = max;
+                DB.Courses.Update(course);
+                DB.SaveChanges();
+                return Json(new { state = true, msg = "Success" });
+            }
+            return Json(new { state = false, msg = "Failed to update" });
         }
     }
 }
