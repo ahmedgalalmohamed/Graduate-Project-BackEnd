@@ -59,8 +59,10 @@ namespace Graduate_Project_BackEnd.Controllers
                 UserLoginVM data = new UserLoginVM()
                 {
                     Email = userLogin.Email,
+                    Id = id,
                     Name = name,
-                    Role = role
+                    Role = role,
+                    Exp = 1,
                 };
                 return Json(new { state = true, msg = "success", token, data });
             }
