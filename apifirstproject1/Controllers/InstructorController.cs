@@ -46,6 +46,7 @@ namespace Graduate_Project_BackEnd.Controllers
             catch { return null; }
             return null;
         }
+
         [HttpPost]
         public IActionResult Add([FromBody] InstructorVM instructor)
         {
