@@ -3,6 +3,8 @@ using Graduate_Project_BackEnd.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using PusherServer;
+using Microsoft.AspNetCore.Authorization;
+
 namespace Graduate_Project_BackEnd.Controllers
 {
     //[Authorize(Roles = "admin")]
@@ -83,7 +85,7 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { msg = $"{cnt}", state = cnt > 0 ? true : false });
         }
 
-        //[Authorize(Roles = "proffessor")]
+        [Authorize(Roles = "proffessor")]
         [HttpGet]
         public IActionResult MyTeams()
         {
@@ -92,7 +94,7 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var profs_teams = DB.Proffessors.Where(p => p.Id == currentUser.Id).SelectMany(p => p.Teams, (prof, teams) => new { teams.Name, teams.Id });
+            var profs_teams = DB.Proffessors.Where(p => p.Id == currentUser.Id).SelectMany(p => p.Teams, (prof, teams) => new { teams.Name, teams.Id ,leader =teams.Leader.Name});
             return Json(new { state = true, msg = "Success", data = profs_teams });
         }
 
