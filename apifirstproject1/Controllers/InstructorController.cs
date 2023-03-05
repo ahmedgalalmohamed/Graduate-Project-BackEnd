@@ -2,6 +2,7 @@
 using Graduate_Project_BackEnd.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Graduate_Project_BackEnd.Controllers
 {
@@ -24,7 +25,27 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "failed", data = Instructors });
         }
 
-        
+        private UserLoginVM GetCurrentUser()
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity != null)
+                {
+                    var userClaims = identity.Claims;
+                    return new UserLoginVM
+                    {
+                        Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email).Value,
+                        Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name).Value,
+                        Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role).Value,
+                        Id = int.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid).Value)
+                    };
+                }
+            }
+            catch { return null; }
+            return null;
+        }
         [HttpPost]
         public IActionResult Add([FromBody] InstructorVM instructor)
         {
