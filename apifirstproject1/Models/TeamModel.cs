@@ -10,7 +10,7 @@
         public CourseModel Course { get; set; }
         public int CourseID { get; set; }
 
-        public ProffessorModel Prof { get; set; }
+        public ProffessorModel? Prof { get; set; }
         public int? ProfID { get; set; }
         
         public bool IsComplete { get; set; } = false;
