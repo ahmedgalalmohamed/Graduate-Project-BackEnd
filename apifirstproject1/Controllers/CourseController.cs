@@ -39,15 +39,6 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = true, msg = "Success" });
         }
 
-        //[HttpGet]
-        //public IActionResult Display()
-        //{
-        //    var Courses = DB.Courses.OrderBy(c => c.Name).ToList();
-        //    if (Courses != null)
-        //        return Json(new { state = true, msg = "Success", data = Courses });
-        //    return Json(new { state = false, msg = "failed", data = Courses });
-        //}
-
         [Authorize(Roles = "student,instructor")]
         [HttpPost]
         public IActionResult Display()
@@ -85,7 +76,7 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "failed", data = Courses });
         }
 
-        [Authorize(Roles = "student,instructor")]
+        [Authorize(Roles = "student")]
         [HttpPost]
         public IActionResult GetCourse([FromForm] int id)
         {
@@ -94,19 +85,6 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var course = DB.Courses.SingleOrDefault(c => c.Id == id);
-            if (course != null)
-            {
-                if (currentUser.Role.Equals("student"))
-                    return(GetStdCourse(id, currentUser));
-                else
-                    return(GetInsCourse(id, currentUser));
-            }
-            return Json(new { state = false, msg = "failed" });
-        }
-
-        private IActionResult GetStdCourse(int id, UserLoginVM currentUser)
-        {
             var course = DB.Courses.SingleOrDefault(c => c.Id == id);
             var std = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
             if (course != null && std != null)
@@ -137,30 +115,6 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { state = false, msg = "failed" });
         }
-
-        private IActionResult GetInsCourse(int id, UserLoginVM currentUser)
-        {
-            var course = DB.Courses.SingleOrDefault(c => c.Id == id && c.InstructorID == currentUser.Id);
-            var ins = DB.Instructors.SingleOrDefault(i => i.Id == currentUser.Id);
-            if (course != null)
-            {
-                var availableTeams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.CourseID, t.IsComplete }).ToList();
-                var availableStd = DB.Courses_Students.Where(cs => cs.CourseID == course.Id && cs.TeamID == null).Select(t => new { t.CourseID }).ToList();
-                CourseStudentVM studentVM = new()
-                {
-                    AvailableTeams = availableTeams == null ? 0 : availableTeams.Count,
-                    AvailableStudents = availableStd == null ? 0 : availableStd.Count,
-                    Name = course.Name,
-                    Description = course.Desciption,
-                    IsGraduate = course.IsGraduate,
-                    MinStd = course.MinStd,
-                    MaxStd = course.MaxStd,
-                };
-                return Json(new { state = true, msg = "Success", data = studentVM });
-            }
-            return Json(new { state = false, msg = "failed" });
-        }
-
 
         [Authorize(Roles = "admin")]
 
