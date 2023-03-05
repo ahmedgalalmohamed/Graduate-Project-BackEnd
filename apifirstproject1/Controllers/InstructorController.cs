@@ -85,5 +85,18 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { msg = $"{cnt}", state = cnt > 0 ? true : false });
         }
+
+        [Authorize(Roles = "instructor")]
+        [HttpPost]
+        public IActionResult MyTeams([FromForm] int id)
+        {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null || currentUser.Id == null || !currentUser.Role.Equals("instructor"))
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            var ins_teams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.Id, t.Name, leader = t.Leader.Name }).ToList();
+            return Json(new { state = true, msg = "Success", data = ins_teams });
+        }
     }
 }
