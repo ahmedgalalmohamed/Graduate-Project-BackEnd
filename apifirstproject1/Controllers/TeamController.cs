@@ -101,7 +101,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Include(t => t.Team).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Include(t => t.Team).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID ,course = s.Course.Name,team = s.Team.Name});
             var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Include(cs => cs.Student).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID });
             if (members != null)
             {
