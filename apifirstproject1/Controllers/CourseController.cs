@@ -38,6 +38,16 @@ namespace Graduate_Project_BackEnd.Controllers
             DB.SaveChanges();
             return Json(new { state = true, msg = "Success" });
         }
+        [Authorize(Roles = "admin")]
+        [HttpGet]
+        public IActionResult Display()
+        {
+
+            var Courses = DB.Courses.ToList();
+            if (Courses != null)
+                return Json(new { state = true, msg = "Success", data = Courses });
+            return Json(new { state = false, msg = "failed", data = Courses });
+        }
 
         [Authorize(Roles = "student,instructor")]
         [HttpPost]
