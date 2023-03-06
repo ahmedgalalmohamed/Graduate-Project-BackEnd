@@ -91,9 +91,6 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     return Json(new { state = false, msg = "failed" });
                 }
-                //if (currentUser.Email.Equals(email))
-                //    role = currentUser.Role;
-                //if (currentUser.Email.Equals(email))
                 switch (role.ToLower())
                 {
                     case "student":
@@ -129,6 +126,47 @@ namespace Graduate_Project_BackEnd.Controllers
             catch { return Json(new { state = false, msg = "Token Invalid" }); }
             return Json(new { state = false, msg = "Not Found" });
         }
+
+        [Authorize(Roles = "instructor,student,proffessor")]
+        [HttpGet]
+        public IActionResult GetEditData()
+        {
+            try
+            {
+                var currentUser = GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return Json(new { state = false, msg = "failed" });
+                }
+                switch (currentUser.Role.ToLower())
+                {
+                    case "student":
+                        var student = DB.Students.Where(s => s.Id == currentUser.Id).Select(s => new { address = s.Address, phone = s.Phone, desc = s.Desciption, team_count = 0 }).ToList();
+                        if (student.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = student });
+
+                    case "instructor":
+                        var instructor = DB.Instructors.Where(i => i.Id == currentUser.Id).Select(i => new { address = i.Address, phone = i.Phone, desc = i.Desciption, team_count = 0 }).ToList();
+                        if (instructor.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = instructor });
+
+                    case "proffessor":
+                        var professor = DB.Proffessors.Where(p => p.Id == currentUser.Id).Select(p => new { address = p.Address, phone = p.Phone, desc = p.Desciption, team_count = p.TeamCount }).ToList();
+                        if (professor.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = professor });
+
+                    default:
+                        return Json(new { state = false, msg = "Role Invalid" });
+                }
+            }
+            catch { return Json(new { state = false, msg = "Token Invalid" }); }
+            return Json(new { state = false, msg = "User Not Found" });
+        }
+
+
         [Authorize(Roles = "instructor,student,proffessor")]
         [HttpPost]
         public IActionResult EditProfile([FromBody] UserVM user)
