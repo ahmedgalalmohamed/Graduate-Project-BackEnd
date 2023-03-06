@@ -40,7 +40,7 @@ namespace Graduate_Project_BackEnd.Controllers
         }
         [Authorize(Roles = "admin")]
         [HttpGet]
-        public IActionResult Display()
+        public IActionResult DisplayCourse()
         {
 
             var Courses = DB.Courses.ToList();
