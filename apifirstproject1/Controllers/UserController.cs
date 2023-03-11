@@ -141,19 +141,19 @@ namespace Graduate_Project_BackEnd.Controllers
                 switch (currentUser.Role.ToLower())
                 {
                     case "student":
-                        var student = DB.Students.Where(s => s.Id == currentUser.Id).Select(s => new { address = s.Address, phone = s.Phone, desc = s.Desciption,img = s.img ,team_count = 0 }).ToList();
+                        var student = DB.Students.Where(s => s.Id == currentUser.Id).Select(s => new { address = s.Address, phone = s.Phone, desc = s.Desciption, img = s.img, team_count = 0 }).ToList();
                         if (student.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = student });
 
                     case "instructor":
-                        var instructor = DB.Instructors.Where(i => i.Id == currentUser.Id).Select(i => new { address = i.Address, phone = i.Phone, desc = i.Desciption,img = i.img , team_count = 0 }).ToList();
+                        var instructor = DB.Instructors.Where(i => i.Id == currentUser.Id).Select(i => new { address = i.Address, phone = i.Phone, desc = i.Desciption, img = i.img, team_count = 0 }).ToList();
                         if (instructor.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = instructor });
 
                     case "proffessor":
-                        var professor = DB.Proffessors.Where(p => p.Id == currentUser.Id).Select(p => new { address = p.Address, phone = p.Phone, desc = p.Desciption,img = p.img , team_count = p.TeamCount }).ToList();
+                        var professor = DB.Proffessors.Where(p => p.Id == currentUser.Id).Select(p => new { address = p.Address, phone = p.Phone, desc = p.Desciption, img = p.img, team_count = p.TeamCount }).ToList();
                         if (professor.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = professor });
@@ -176,46 +176,53 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            switch (currentUser.Role.ToLower())
+            try
             {
-                case "student":
-                    var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
-                    if (student == null)
-                        break;
-                    student.Desciption = user.Description;
-                    student.Address = user.Address;
-                    student.Phone = user.Phone;
-                    DB.Students.Update(student);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                switch (currentUser.Role.ToLower())
+                {
+                    case "student":
+                        var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
+                        if (student == null || student.Phone.Equals(user.Phone))
+                            break;
+                        student.Desciption = user.Description;
+                        student.Address = user.Address;
+                        student.Phone = user.Phone;
+                        DB.Students.Update(student);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                case "instructor":
-                    var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
-                    if (instructor == null)
-                        break;
-                    instructor.Desciption = user.Description;
-                    instructor.Address = user.Address;
-                    instructor.Phone = user.Phone;
-                    DB.Instructors.Update(instructor);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                    case "instructor":
+                        var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
+                        if (instructor == null || instructor.Phone.Equals(user.Phone))
+                            break;
+                        instructor.Desciption = user.Description;
+                        instructor.Address = user.Address;
+                        instructor.Phone = user.Phone;
+                        DB.Instructors.Update(instructor);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                case "proffessor":
-                    var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
-                    if (prof == null)
-                        break;
-                    prof.Desciption = user.Description;
-                    prof.Address = user.Address;
-                    prof.Phone = user.Phone;
-                    prof.TeamCount = (int)user.TeamCount;
-                    DB.Proffessors.Update(prof);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                    case "proffessor":
+                        var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
+                        if (prof == null || prof.Phone.Equals(user.Phone))
+                            break;
+                        prof.Desciption = user.Description;
+                        prof.Address = user.Address;
+                        prof.Phone = user.Phone;
+                        prof.TeamCount = (int)user.TeamCount;
+                        DB.Proffessors.Update(prof);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                default:
-                    return Json(new { state = false, msg = "Role Invalid" });
+                    default:
+                        return Json(new { state = false, msg = "Role Invalid" });
+                }
+                return Json(new { state = false, msg = "Failed To Update OR Invalid Phone Number" });
             }
-            return Json(new { state = false, msg = "Failed To Update" });
+            catch (Exception e)
+            {
+                return Json(new { state = false, msg = "Failed To Update OR Invalid Phone Number" });
+            }
         }
         [Authorize(Roles = "instructor,student,proffessor")]
         [HttpPost]
@@ -226,39 +233,45 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            switch (currentUser.Role.ToLower())
+            try
             {
-                case "student":
-                    var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id && s.Password.Equals(oldPass));
-                    if (student == null)
-                        return Json(new { state = false, msg = "Incorrect Password" });
-                    student.Password = newPass;
-                    DB.Students.Update(student);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                switch (currentUser.Role.ToLower())
+                {
+                    case "student":
+                        var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id && s.Password.Equals(oldPass));
+                        if (student == null)
+                            return Json(new { state = false, msg = "Incorrect Password" });
+                        student.Password = newPass;
+                        DB.Students.Update(student);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                case "instructor":
-                    var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
-                    if (instructor == null)
-                        return Json(new { state = false, msg = "Incorrect Password" });
-                    instructor.Password = newPass;
-                    DB.Instructors.Update(instructor);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                    case "instructor":
+                        var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
+                        if (instructor == null)
+                            return Json(new { state = false, msg = "Incorrect Password" });
+                        instructor.Password = newPass;
+                        DB.Instructors.Update(instructor);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                case "proffessor":
-                    var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
-                    if (prof == null)
-                        return Json(new { state = false, msg = "Incorrect Password" });
-                    prof.Password = newPass;
-                    DB.Proffessors.Update(prof);
-                    DB.SaveChanges();
-                    return Json(new { state = true, msg = "success" });
+                    case "proffessor":
+                        var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
+                        if (prof == null)
+                            return Json(new { state = false, msg = "Incorrect Password" });
+                        prof.Password = newPass;
+                        DB.Proffessors.Update(prof);
+                        DB.SaveChanges();
+                        return Json(new { state = true, msg = "success" });
 
-                default:
-                    return Json(new { state = false, msg = "Role Invalid" });
+                    default:
+                        return Json(new { state = false, msg = "Role Invalid" });
+                }
             }
-            return Json(new { state = false, msg = "Failed To Update" });
+            catch (Exception e)
+            {
+                return Json(new { state = false, msg = "Failed To Update" });
+            }
         }
         [HttpPost]
         public IActionResult ChangeImg([FromForm] IFormFile file)
