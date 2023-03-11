@@ -167,7 +167,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 var cour_std = DB.Courses_Students.Where(s => s.TeamID == id).Select(c => new { c.Course.MaxStd, c.Course.MinStd }).ToList();
                 if ((complete == true && cour_std.Count < cour_std[0].MinStd) || (!complete && cour_std.Count == cour_std[0].MaxStd))
                 {
-                    return Json(new { state = false, msg = "Unable to change stat" });
+                    return Json(new { state = false, msg = "Unable to change stat", data = team[0].IsComplete });
                 }
                 DB.Teams.Update(new TeamModel()
                 {
@@ -178,9 +178,9 @@ namespace Graduate_Project_BackEnd.Controllers
                     IsComplete = complete,
                 });
                 DB.SaveChanges();
-                return Json(new { state = true, msg = "Done" });
+                return Json(new { state = true, msg = "Done", data = complete });
             }
-            return Json(new { state = false, msg = "Can not change stat" });
+            return Json(new { state = false, msg = "Can not change stat", data = team[0].IsComplete });
         }
 
 
