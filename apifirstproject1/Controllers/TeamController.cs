@@ -163,6 +163,12 @@ namespace Graduate_Project_BackEnd.Controllers
             var team = DB.Teams.Where(t => t.Id == id && t.LeaderID == currentUser.Id).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
             if (team.Count > 0)
             {
+
+                var cour_std = DB.Courses_Students.Where(s => s.TeamID == id).Select(c => new { c.Course.MaxStd, c.Course.MinStd }).ToList();
+                if ((complete == true && cour_std.Count < cour_std[0].MinStd) || (!complete && cour_std.Count == cour_std[0].MaxStd))
+                {
+                    return Json(new { state = false, msg = "Unable to change stat" });
+                }
                 DB.Teams.Update(new TeamModel()
                 {
                     Id = team[0].Id,
