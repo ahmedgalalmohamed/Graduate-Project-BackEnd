@@ -151,6 +151,32 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "Failed to get data" });
         }
 
+        [HttpPost]
+        [Authorize(Roles = "student")]
+        public IActionResult SetComplete([FromForm] int id, [FromForm] bool complete)
+        {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            var team = DB.Teams.Where(t => t.Id == id && t.LeaderID == currentUser.Id).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+            if (team.Count > 0)
+            {
+                DB.Teams.Update(new TeamModel()
+                {
+                    Id = team[0].Id,
+                    Name = team[0].Name,
+                    CourseID = team[0].CourseID,
+                    LeaderID = team[0].LeaderID,
+                    IsComplete = complete,
+                });
+                DB.SaveChanges();
+                return Json(new { state = true, msg = "Done" });
+            }
+            return Json(new { state = false, msg = "Can not change stat" });
+        }
+
 
         private UserLoginVM GetCurrentUser()
         {
