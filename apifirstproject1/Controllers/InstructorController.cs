@@ -54,10 +54,12 @@ namespace Graduate_Project_BackEnd.Controllers
             InstructorModel found = DB.Instructors.SingleOrDefault(i => i.Email.Equals(instructor.Email));
             if (found != null)
                 return Json(new { state = false, msg = "Instructor found" });
+            ImageConverter image = new("../default-avatar.png");
             InstructorModel newInstructor = new InstructorModel();
             newInstructor.Name = instructor.Name;
             newInstructor.Email = instructor.Email;
             newInstructor.Password = instructor.Password;
+            newInstructor.img = image.Converter();
             DB.Instructors.Add(newInstructor);
             DB.SaveChanges();
             return Json(new { state = true, msg = "Success" });
@@ -118,8 +120,8 @@ namespace Graduate_Project_BackEnd.Controllers
                 return Json(new { state = false, msg = "failed" });
             }
             var teams = DB.Teams.Where(t => t.CourseID == id).Select(t => new { t.Id, t.Name, leader = t.Leader.Name }).ToList();
-            var courseName=DB.Courses.SingleOrDefault(c=>c.Id == id).Name;
-            return Json(new { state = true, msg = "Success", data = new {teams,courseName} });
+            var courseName = DB.Courses.SingleOrDefault(c => c.Id == id).Name;
+            return Json(new { state = true, msg = "Success", data = new { teams, courseName } });
         }
     }
 }

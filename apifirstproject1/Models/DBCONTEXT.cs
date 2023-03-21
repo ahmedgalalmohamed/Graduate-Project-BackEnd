@@ -1,5 +1,4 @@
-﻿using Graduate_Project_BackEnd.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Graduate_Project_BackEnd.Models
 {
@@ -17,6 +16,8 @@ namespace Graduate_Project_BackEnd.Models
         public DbSet<ProfNotificationsModel> profNotifications { get; set; }
         //public DbSet<StudentTeamModel> Students_Teams { get; set; }
         public DbSet<SkilsModel> Skils { get; set; }
+        public DbSet<ChatModel> Chat { get; set; }
+
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -53,7 +54,7 @@ namespace Graduate_Project_BackEnd.Models
             modelBuilder.Entity<NotificationModel>().HasOne<StudentsModel>(n => n.Student).WithMany(s => s.Notifications).HasForeignKey(n => n.StudentId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<SkilsModel>().HasOne<StudentsModel>(sk => sk.Student).WithMany(s => s.Skils).HasForeignKey(sk => sk.StudentID).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ProfNotificationsModel>().HasOne<ProffessorModel>(n => n.professor).WithMany(s => s.Notifications).HasForeignKey(n => n.ProfId).OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder.Entity<ChatModel>().HasOne<TeamModel>(c => c.Team).WithMany(t => t.Chats).HasForeignKey(c => c.TeamID).OnDelete(DeleteBehavior.Cascade);
             base.OnModelCreating(modelBuilder);
         }
 

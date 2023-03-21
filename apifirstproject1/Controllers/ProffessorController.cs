@@ -33,10 +33,12 @@ namespace Graduate_Project_BackEnd.Controllers
             ProffessorModel found = DB.Proffessors.SingleOrDefault(p => p.Email.Equals(proffessor.Email));
             if (found != null)
                 return Json(new { state = false, msg = "Proffessor found" });
+            ImageConverter image = new("../default-avatar.png");
             ProffessorModel newProffessor = new ProffessorModel();
             newProffessor.Name = proffessor.Name;
             newProffessor.Email = proffessor.Email;
             newProffessor.Password = proffessor.Password;
+            newProffessor.img = image.Converter();
             DB.Proffessors.Add(newProffessor);
             DB.SaveChanges();
             return Json(new { state = true, msg = "Success" });
@@ -94,7 +96,7 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var profs_teams = DB.Proffessors.Where(p => p.Id == currentUser.Id).SelectMany(p => p.Teams, (prof, teams) => new { teams.Name, teams.Id ,leader =teams.Leader.Name});
+            var profs_teams = DB.Proffessors.Where(p => p.Id == currentUser.Id).SelectMany(p => p.Teams, (prof, teams) => new { teams.Name, teams.Id, leader = teams.Leader.Name });
             return Json(new { state = true, msg = "Success", data = profs_teams });
         }
 
@@ -106,7 +108,7 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = true, msg = "Success", data = Profs });
 
         }
-        
+
 
         private UserLoginVM GetCurrentUser()
         {
@@ -201,7 +203,7 @@ namespace Graduate_Project_BackEnd.Controllers
 
             return Json(new { state = true, msg = "Success", data = new { senders, count = senders.Count } });
         }
- [HttpGet]
+        [HttpGet]
         public async void Pusher_notifiy()
         {
             var pusher = new Pusher(

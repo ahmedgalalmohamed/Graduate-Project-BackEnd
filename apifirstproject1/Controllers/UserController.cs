@@ -281,10 +281,8 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var ms = new MemoryStream();
-            file.CopyTo(ms);
-            string img = "data:image/png;base64, " + Convert.ToBase64String(ms.ToArray());
-            ms.Close();
+            ImageConverter image = new(file);
+            string img = image.Converter();
             switch (currentUser.Role.ToLower())
             {
                 case "student":

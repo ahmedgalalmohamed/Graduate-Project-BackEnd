@@ -27,12 +27,14 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "Found" });
             }
+            ImageConverter image = new("../default-avatar.png");
             StudentsModel student = new()
             {
                 Name = studentModel.Name,
                 Email = studentModel.Email,
                 Password = studentModel.Password,
                 Semester = studentModel.Semester,
+                img = image.Converter(),
             };
             DB.Students.Add(student);
             DB.SaveChanges();
