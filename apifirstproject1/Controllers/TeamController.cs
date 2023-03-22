@@ -1,4 +1,4 @@
-﻿    using Graduate_Project_BackEnd.ViewModel;
+﻿using Graduate_Project_BackEnd.ViewModel;
 using Graduate_Project_BackEnd.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -101,11 +101,12 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID, s.CourseID, course = s.Course.Name, team = s.Team.Name,s.Team.IsComplete,s.Student.img });
-            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID,s.Student.img });
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID, s.CourseID, course = s.Course.Name, team = s.Team.Name, s.Team.IsComplete, s.Student.img });
+            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID, s.Student.img });
+            var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => new { p.Prof.Id, p.Prof.Name, p.Prof.Email, p.Prof.img }).ToList();
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] } });
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }
