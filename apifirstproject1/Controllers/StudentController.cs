@@ -112,6 +112,7 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             List<string> students = new List<string>();
             List<string> courses = new List<string>();
+            ImageConverter image = new("../default-avatar.png");
             var reader = new StreamReader(readexcel.OpenReadStream());
             var header = (reader.ReadLine().ToLower()).Split(',').ToList();
             while (reader.Peek() >= 0)
@@ -122,7 +123,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     students.Add(std[header.IndexOf("email")]);
                     courses.Add(std[header.IndexOf("courses")]);
-                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("password")], Semester = int.Parse(std[header.IndexOf("semester")]) });
+                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("password")], Semester = int.Parse(std[header.IndexOf("semester")]),img = image.Converter() });
                     DB.SaveChanges();
                 }
             }

@@ -71,6 +71,7 @@ namespace Graduate_Project_BackEnd.Controllers
         public IActionResult AddCSV([FromForm] IFormFile readexcel)
         {
             int cnt = 0;
+            ImageConverter image = new("../default-avatar.png");
             var reader = new StreamReader(readexcel.OpenReadStream());
             var header = (reader.ReadLine().ToLower()).Split(',').ToList();
             while (reader.Peek() >= 0)
@@ -80,7 +81,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (found == null)
                 {
                     cnt++;
-                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")] });
+                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")],img = image.Converter() });
                     DB.SaveChanges();
                 }
             }

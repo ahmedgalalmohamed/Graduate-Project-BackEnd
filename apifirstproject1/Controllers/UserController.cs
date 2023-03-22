@@ -182,7 +182,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     case "student":
                         var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (student == null || student.Phone.Equals(user.Phone))
+                        if (student == null || student.Phone == user.Phone)
                             break;
                         student.Desciption = user.Description;
                         student.Address = user.Address;
@@ -193,7 +193,7 @@ namespace Graduate_Project_BackEnd.Controllers
 
                     case "instructor":
                         var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (instructor == null || instructor.Phone.Equals(user.Phone))
+                        if (instructor == null || instructor.Phone == user.Phone)
                             break;
                         instructor.Desciption = user.Description;
                         instructor.Address = user.Address;
@@ -204,7 +204,7 @@ namespace Graduate_Project_BackEnd.Controllers
 
                     case "proffessor":
                         var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (prof == null || prof.Phone.Equals(user.Phone))
+                        if (prof == null || prof.Phone == user.Phone)
                             break;
                         prof.Desciption = user.Description;
                         prof.Address = user.Address;
