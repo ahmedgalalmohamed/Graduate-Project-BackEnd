@@ -19,7 +19,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpGet]
         public IActionResult Display()
         {
-            var Instructors = DB.Instructors.OrderBy(i => i.Name).ToList();
+            var Instructors = DB.Instructors.OrderBy(i => i.Name).Select(i => new { i.Id, i.Name, i.Email, i.Password }).ToList();
             if (Instructors != null)
                 return Json(new { state = true, msg = "Success", data = Instructors });
             return Json(new { state = false, msg = "failed", data = Instructors });
@@ -104,7 +104,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (found == null)
                 {
                     cnt++;
-                    DB.Instructors.Add(new InstructorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")],img = image.Converter() });
+                    DB.Instructors.Add(new InstructorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")], img = image.Converter() });
                     DB.SaveChanges();
                 }
             }

@@ -182,33 +182,42 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     case "student":
                         var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (student == null || student.Phone == user.Phone)
+                        if (student == null)
                             break;
                         student.Desciption = user.Description;
                         student.Address = user.Address;
-                        student.Phone = user.Phone;
+                        if (user.Phone.Equals(""))
+                            student.Phone = null;
+                        else
+                            student.Phone = user.Phone;
                         DB.Students.Update(student);
                         DB.SaveChanges();
                         return Json(new { state = true, msg = "success" });
 
                     case "instructor":
                         var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (instructor == null || instructor.Phone == user.Phone)
+                        if (instructor == null)
                             break;
                         instructor.Desciption = user.Description;
                         instructor.Address = user.Address;
-                        instructor.Phone = user.Phone;
+                        if (user.Phone.Equals(""))
+                            instructor.Phone = null;
+                        else
+                            instructor.Phone = user.Phone;
                         DB.Instructors.Update(instructor);
                         DB.SaveChanges();
                         return Json(new { state = true, msg = "success" });
 
                     case "proffessor":
                         var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
-                        if (prof == null || prof.Phone == user.Phone)
+                        if (prof == null)
                             break;
                         prof.Desciption = user.Description;
                         prof.Address = user.Address;
-                        prof.Phone = user.Phone;
+                        if (user.Phone.Equals(""))
+                            prof.Phone = null;
+                        else
+                            prof.Phone = user.Phone;
                         prof.TeamCount = (int)user.TeamCount;
                         DB.Proffessors.Update(prof);
                         DB.SaveChanges();

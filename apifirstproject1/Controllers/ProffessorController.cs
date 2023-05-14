@@ -21,7 +21,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpGet]
         public IActionResult Display()
         {
-            var Proffessors = DB.Proffessors.OrderBy(p => p.Name).ToList();
+            var Proffessors = DB.Proffessors.OrderBy(p => p.Name).Select(p => new { p.Id, p.Name, p.Email, p.Password }).ToList();
             if (Proffessors != null)
                 return Json(new { state = true, msg = "Success", data = Proffessors });
             return Json(new { state = false, msg = "failed", data = Proffessors });
@@ -81,7 +81,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (found == null)
                 {
                     cnt++;
-                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")],img = image.Converter() });
+                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")], img = image.Converter() });
                     DB.SaveChanges();
                 }
             }

@@ -43,7 +43,7 @@ namespace Graduate_Project_BackEnd.Controllers
         public IActionResult DisplayCourse()
         {
 
-            var Courses = DB.Courses.ToList();
+            var Courses = DB.Courses.Select(c => new { c.Id, c.Name }).OrderBy(c => c.Name).ToList();
             if (Courses != null)
                 return Json(new { state = true, msg = "Success", data = Courses });
             return Json(new { state = false, msg = "failed", data = Courses });

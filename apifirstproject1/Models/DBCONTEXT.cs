@@ -21,8 +21,10 @@ namespace Graduate_Project_BackEnd.Models
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // "Data Source=SQL8001.site4now.net;Initial Catalog=db_a98bca_jonyweaker;User Id=db_a98bca_jonyweaker_admin;Password=YOUR_DB_PASSWORD
+        // Server=.;Database=TMS;User Id=sa;Password=12345;"
         {
-            optionsBuilder.UseSqlServer(@"Server=.;Database=TMS;User Id=sa;Password=12345;");
+            optionsBuilder.UseSqlServer(@"Data Source=SQL8001.site4now.net;Initial Catalog=db_a98bca_jonyweaker;User Id=db_a98bca_jonyweaker_admin;Password=qwertyuiop0");
 
             base.OnConfiguring(optionsBuilder);
         }
