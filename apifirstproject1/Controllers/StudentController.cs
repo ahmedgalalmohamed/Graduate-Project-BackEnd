@@ -34,7 +34,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 Email = studentModel.Email,
                 Password = studentModel.Password,
                 Semester = studentModel.Semester,
-                img = image.Converter(),
+                //img = image.Converter(),
             };
             DB.Students.Add(student);
             DB.SaveChanges();
