@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text;
 namespace Graduate_Project_BackEnd.Controllers
 {
 
@@ -13,9 +12,11 @@ namespace Graduate_Project_BackEnd.Controllers
     public class StudentController : Controller
     {
         DBCONTEXT DB;
-        public StudentController(DBCONTEXT dB)
+        public static IWebHostEnvironment _environment;
+        public StudentController(DBCONTEXT dB, IWebHostEnvironment environment)
         {
             DB = dB;
+            _environment = environment;
         }
         [Authorize(Roles = "admin")]
         [HttpPost]
@@ -27,14 +28,14 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "Found" });
             }
-           // ImageConverter image = new("../default-avatar.png");
+            ImageConverter image = new("wwwroot/default-avatar.png");
             StudentsModel student = new()
             {
                 Name = studentModel.Name,
                 Email = studentModel.Email,
                 Password = studentModel.Password,
                 Semester = studentModel.Semester,
-                //img = image.Converter(),
+                img = image.Converter(),
             };
             DB.Students.Add(student);
             DB.SaveChanges();
@@ -123,7 +124,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 {
                     students.Add(std[header.IndexOf("email")]);
                     courses.Add(std[header.IndexOf("courses")]);
-                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("password")], Semester = int.Parse(std[header.IndexOf("semester")]),img = image.Converter() });
+                    DB.Students.Add(new StudentsModel() { Name = std[header.IndexOf("name")], Email = std[header.IndexOf("email")], Password = std[header.IndexOf("password")], Semester = int.Parse(std[header.IndexOf("semester")]), img = image.Converter() });
                     DB.SaveChanges();
                 }
             }

@@ -54,7 +54,7 @@ namespace Graduate_Project_BackEnd.Controllers
             InstructorModel found = DB.Instructors.SingleOrDefault(i => i.Email.Equals(instructor.Email));
             if (found != null)
                 return Json(new { state = false, msg = "Instructor found" });
-            ImageConverter image = new("../default-avatar.png");
+            ImageConverter image = new("wwwroot/default-avatar.png");
             InstructorModel newInstructor = new InstructorModel();
             newInstructor.Name = instructor.Name;
             newInstructor.Email = instructor.Email;

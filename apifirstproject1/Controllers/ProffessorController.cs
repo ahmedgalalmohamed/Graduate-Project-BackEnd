@@ -33,7 +33,7 @@ namespace Graduate_Project_BackEnd.Controllers
             ProffessorModel found = DB.Proffessors.SingleOrDefault(p => p.Email.Equals(proffessor.Email));
             if (found != null)
                 return Json(new { state = false, msg = "Proffessor found" });
-            ImageConverter image = new("../default-avatar.png");
+            ImageConverter image = new("wwwroot/default-avatar.png");
             ProffessorModel newProffessor = new ProffessorModel();
             newProffessor.Name = proffessor.Name;
             newProffessor.Email = proffessor.Email;
