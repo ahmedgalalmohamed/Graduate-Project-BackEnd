@@ -27,7 +27,7 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "Found" });
             }
-            ImageConverter image = new("../default-avatar.png");
+           // ImageConverter image = new("../default-avatar.png");
             StudentsModel student = new()
             {
                 Name = studentModel.Name,

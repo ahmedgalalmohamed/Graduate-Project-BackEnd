@@ -51,23 +51,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 var app = builder.Build();
 
-try
-{
 
-    var flag = app.Services.CreateScope().ServiceProvider.GetRequiredService<DBCONTEXT>().Database.EnsureCreated();
-    if (flag)
-    {
-        Console.WriteLine("**************************************");
-        Console.WriteLine("\t\tDataBase Created :)");
-        Console.WriteLine("**************************************");
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine("**************************************");
-    Console.WriteLine(ex.Message);
-    Console.WriteLine("**************************************");
-}
 
 
 
@@ -75,6 +59,23 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    try
+    {
+
+        var flag = app.Services.CreateScope().ServiceProvider.GetRequiredService<DBCONTEXT>().Database.EnsureCreated();
+        if (flag)
+        {
+            Console.WriteLine("**************************************");
+            Console.WriteLine("\t\tDataBase Created :)");
+            Console.WriteLine("**************************************");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("**************************************");
+        Console.WriteLine(ex.Message);
+        Console.WriteLine("**************************************");
+    }
 }
 
 app.UseHttpsRedirection();
