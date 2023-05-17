@@ -94,7 +94,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 switch (role.ToLower())
                 {
                     case "student":
-                        var student = DB.Students.Where(s => s.Id == id).Select(s => new { s.Id, s.Name, s.Email, s.Address, s.Phone, s.Desciption, s.img, s.Semester }).ToList();
+                        var student = DB.Students.Where(s => s.Id == id).Select(s => new { s.Id, s.Name, s.Email, s.Address, s.Phone, s.Desciption, s.Semester }).ToList();
                         if (student.Count == 0)
                             break;
                         var skills = DB.Skils.Where(s => s.StudentID == student[0].Id);
@@ -103,7 +103,7 @@ namespace Graduate_Project_BackEnd.Controllers
                         return Json(new { state = true, msg = msg, data = new { user = student, skills } });
 
                     case "instructor":
-                        var instructor = DB.Instructors.Where(i => i.Id == id).Select(i => new { i.Id, i.Name, i.Email, i.Address, i.Phone, i.Desciption, i.img }).ToList();
+                        var instructor = DB.Instructors.Where(i => i.Id == id).Select(i => new { i.Id, i.Name, i.Email, i.Address, i.Phone, i.Desciption }).ToList();
                         if (instructor.Count == 0)
                             break;
                         if (currentUser.Id == instructor[0].Id && currentUser.Role.ToLower() == role.ToLower())
@@ -111,12 +111,51 @@ namespace Graduate_Project_BackEnd.Controllers
                         return Json(new { state = true, msg = msg, data = new { user = instructor } });
 
                     case "proffessor":
-                        var professor = DB.Proffessors.Where(p => p.Id == id).Select(p => new { p.Id, p.Name, p.Email, p.Address, p.Phone, p.Desciption, p.img, p.TeamCount }).ToList();
+                        var professor = DB.Proffessors.Where(p => p.Id == id).Select(p => new { p.Id, p.Name, p.Email, p.Address, p.Phone, p.Desciption, p.TeamCount }).ToList();
                         if (professor.Count == 0)
                             break;
                         if (currentUser.Id == professor[0].Id && currentUser.Role.ToLower() == role.ToLower())
                             msg = "own";
                         return Json(new { state = true, msg = msg, data = new { user = professor } });
+
+                    default:
+                        return Json(new { state = false, msg = "Role Invalid" });
+                }
+                return Json(new { state = false, msg = "Role Invalid or user not found" });
+            }
+            catch { return Json(new { state = false, msg = "Token Invalid" }); }
+            return Json(new { state = false, msg = "Not Found" });
+        }
+
+        [HttpGet]
+        public IActionResult GetImage([FromForm] int id, [FromForm] string role)
+        {
+            try
+            {
+                var currentUser = GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return Json(new { state = false, msg = "failed" });
+                }
+                switch (role.ToLower())
+                {
+                    case "student":
+                        var student = DB.Students.Where(s => s.Id == id).Select(s => s.img).ToList();
+                        if (student.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = student[0] });
+
+                    case "instructor":
+                        var instructor = DB.Instructors.Where(i => i.Id == id).Select(i => i.img).ToList();
+                        if (instructor.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = instructor[0] });
+
+                    case "proffessor":
+                        var professor = DB.Proffessors.Where(p => p.Id == id).Select(p => p.img).ToList();
+                        if (professor.Count == 0)
+                            break;
+                        return Json(new { state = true, msg = "Success", data = professor[0] });
 
                     default:
                         return Json(new { state = false, msg = "Role Invalid" });
