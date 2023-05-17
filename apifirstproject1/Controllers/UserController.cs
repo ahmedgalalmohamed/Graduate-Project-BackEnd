@@ -127,7 +127,7 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "Not Found" });
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult GetImage([FromForm] int id, [FromForm] string role)
         {
             try
