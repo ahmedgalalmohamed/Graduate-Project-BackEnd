@@ -126,7 +126,7 @@ namespace Graduate_Project_BackEnd.Controllers
             catch { return Json(new { state = false, msg = "Token Invalid" }); }
             return Json(new { state = false, msg = "Not Found" });
         }
-
+        [Authorize(Roles = "instructor,student,proffessor")]
         [HttpPost]
         public IActionResult GetImage([FromForm] int id, [FromForm] string role)
         {
