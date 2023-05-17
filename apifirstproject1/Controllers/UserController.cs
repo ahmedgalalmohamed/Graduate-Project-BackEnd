@@ -180,19 +180,19 @@ namespace Graduate_Project_BackEnd.Controllers
                 switch (currentUser.Role.ToLower())
                 {
                     case "student":
-                        var student = DB.Students.Where(s => s.Id == currentUser.Id).Select(s => new { address = s.Address, phone = s.Phone, desc = s.Desciption, img = s.img, team_count = 0 }).ToList();
+                        var student = DB.Students.Where(s => s.Id == currentUser.Id).Select(s => new { address = s.Address, phone = s.Phone, desc = s.Desciption, team_count = 0 }).ToList();
                         if (student.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = student });
 
                     case "instructor":
-                        var instructor = DB.Instructors.Where(i => i.Id == currentUser.Id).Select(i => new { address = i.Address, phone = i.Phone, desc = i.Desciption, img = i.img, team_count = 0 }).ToList();
+                        var instructor = DB.Instructors.Where(i => i.Id == currentUser.Id).Select(i => new { address = i.Address, phone = i.Phone, desc = i.Desciption, team_count = 0 }).ToList();
                         if (instructor.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = instructor });
 
                     case "proffessor":
-                        var professor = DB.Proffessors.Where(p => p.Id == currentUser.Id).Select(p => new { address = p.Address, phone = p.Phone, desc = p.Desciption, img = p.img, team_count = p.TeamCount }).ToList();
+                        var professor = DB.Proffessors.Where(p => p.Id == currentUser.Id).Select(p => new { address = p.Address, phone = p.Phone, desc = p.Desciption, team_count = p.TeamCount }).ToList();
                         if (professor.Count == 0)
                             break;
                         return Json(new { state = true, msg = "Success", data = professor });
