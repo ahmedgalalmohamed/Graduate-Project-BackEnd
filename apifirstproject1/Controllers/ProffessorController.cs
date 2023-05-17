@@ -33,12 +33,12 @@ namespace Graduate_Project_BackEnd.Controllers
             ProffessorModel found = DB.Proffessors.SingleOrDefault(p => p.Email.Equals(proffessor.Email));
             if (found != null)
                 return Json(new { state = false, msg = "Proffessor found" });
-            ImageConverter image = new("wwwroot/default-avatar.png");
+      
             ProffessorModel newProffessor = new ProffessorModel();
             newProffessor.Name = proffessor.Name;
             newProffessor.Email = proffessor.Email;
             newProffessor.Password = proffessor.Password;
-            newProffessor.img = image.Converter();
+            newProffessor.img = ImageConverter.Converter("wwwroot/default-avatar.png");
             DB.Proffessors.Add(newProffessor);
             DB.SaveChanges();
             return Json(new { state = true, msg = "Success" });
@@ -71,9 +71,10 @@ namespace Graduate_Project_BackEnd.Controllers
         public IActionResult AddCSV([FromForm] IFormFile readexcel)
         {
             int cnt = 0;
-            ImageConverter image = new("../default-avatar.png");
+
             var reader = new StreamReader(readexcel.OpenReadStream());
             var header = (reader.ReadLine().ToLower()).Split(',').ToList();
+            string image = ImageConverter.Converter("wwwroot/default-avatar.png");
             while (reader.Peek() >= 0)
             {
                 var prof = (reader.ReadLine()).Split(',').ToList();
@@ -81,7 +82,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (found == null)
                 {
                     cnt++;
-                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")], img = image.Converter() });
+                    DB.Proffessors.Add(new ProffessorModel() { Name = prof[header.IndexOf("name")], Email = prof[header.IndexOf("email")], Password = prof[header.IndexOf("password")], img = image });
                     DB.SaveChanges();
                 }
             }

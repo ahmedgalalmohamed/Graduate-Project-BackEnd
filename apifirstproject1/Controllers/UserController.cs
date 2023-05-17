@@ -283,43 +283,41 @@ namespace Graduate_Project_BackEnd.Controllers
             }
         }
         [HttpPost]
-        public IActionResult ChangeImg([FromForm] IFormFile file)
+        public IActionResult ChangeImg([FromForm] string file)
         {
             var currentUser = GetCurrentUser();
             if (currentUser == null)
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            ImageConverter image = new(file);
-            string img = image.Converter();
             switch (currentUser.Role.ToLower())
             {
                 case "student":
                     var student = DB.Students.SingleOrDefault(s => s.Id == currentUser.Id);
                     if (student == null)
                         break;
-                    student.img = img;
+                    student.img = file;
                     DB.Students.Update(student);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success", data = file });
 
                 case "instructor":
                     var instructor = DB.Instructors.SingleOrDefault(s => s.Id == currentUser.Id);
                     if (instructor == null)
                         break;
-                    instructor.img = img;
+                    instructor.img = file;
                     DB.Instructors.Update(instructor);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success", data = file });
 
                 case "proffessor":
                     var prof = DB.Proffessors.SingleOrDefault(s => s.Id == currentUser.Id);
                     if (prof == null)
                         break;
-                    prof.img = img;
+                    prof.img = file;
                     DB.Proffessors.Update(prof);
                     DB.SaveChanges();
-                    return Json(new { state = true, msg = "success", data = img });
+                    return Json(new { state = true, msg = "success", data = file });
 
                 default:
                     return Json(new { state = false, msg = "Role Invalid" });
