@@ -24,7 +24,7 @@ namespace Graduate_Project_BackEnd.Models
         // "Data Source=SQL8001.site4now.net;Initial Catalog=db_a98bca_jonyweaker;User Id=db_a98bca_jonyweaker_admin;Password=YOUR_DB_PASSWORD
         // Server=.;Database=TMS;User Id=sa;Password=12345;"
         {
-            optionsBuilder.UseSqlServer(@"Data Source=SQL8001.site4now.net;Initial Catalog=db_a98bca_jonyweaker;User Id=db_a98bca_jonyweaker_admin;Password=qwertyuiop0");
+            optionsBuilder.UseSqlServer(@"Data Source=SQL5101.site4now.net,1433;Initial Catalog=db_a9b1e6_tms;User Id=db_a9b1e6_tms_admin;Password=IMZ13042001");
 
             base.OnConfiguring(optionsBuilder);
         }

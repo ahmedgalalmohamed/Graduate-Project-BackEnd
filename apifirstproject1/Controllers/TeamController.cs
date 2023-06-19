@@ -91,7 +91,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             else if (currentUser.Role.Equals("proffessor"))
             {
-                var team = DB.Teams.Where(t => t.Id == id).Select(t => t.Id).ToList();
+                var team = DB.Teams.Where(t => t.Id == id && t.ProfID == currentUser.Id).Select(t => t.Id).ToList();
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
