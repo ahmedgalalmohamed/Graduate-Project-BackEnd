@@ -29,6 +29,7 @@ namespace Graduate_Project_BackEnd.Controllers
                     SenderId = chat.SenderId,
                     TeamID = chat.TeamId,
                     Role = chat.Role,
+                    Type = chat.Type
                 };
                 DB.Chat.Add(newchat);
                 DB.SaveChanges();

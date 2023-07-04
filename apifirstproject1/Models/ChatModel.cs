@@ -8,5 +8,6 @@
         public string Role { get; set; }
         public TeamModel Team { get; set; }
         public int TeamID { get; set; }
+        public string Type { get; set; } = "msg";
     }
 }
