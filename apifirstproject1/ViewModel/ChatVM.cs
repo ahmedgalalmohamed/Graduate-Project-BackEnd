@@ -7,5 +7,6 @@
         public int SenderId { get; set; }
         public string Role { get; set; }
         public string Type { get; set; }
+        public string? FileName { get; set; }
     }
 }

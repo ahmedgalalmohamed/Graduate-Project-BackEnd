@@ -1,8 +1,8 @@
-﻿using Graduate_Project_BackEnd.Models;
+﻿using apifirstproject1.Models;
+using Graduate_Project_BackEnd.Models;
 using Graduate_Project_BackEnd.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PusherServer;
 using System.Security.Claims;
 
@@ -19,10 +19,23 @@ namespace Graduate_Project_BackEnd.Controllers
         }
         public IActionResult Add([FromBody] ChatVM chat)
         {
+            int? id_datafile = null;
             bool vf_dr = DB.Teams.Any(t => t.Id == chat.TeamId && t.ProfID == chat.SenderId);
             bool vf_st = DB.Courses_Students.Any(cs => cs.TeamID == chat.TeamId && cs.StudentID == chat.SenderId);
             if (vf_dr || vf_st)
             {
+                if (chat.Type.Equals("file"))
+                {
+                    DataFile dataFile = new()
+                    {
+                        data = chat.Message,
+                        name = chat.FileName
+                    };
+                    DB.DataFiles.Add(dataFile);
+                    DB.SaveChanges();
+                    id_datafile = dataFile.Id;
+                }
+                if (id_datafile != null) chat.Message = id_datafile.ToString();
                 ChatModel newchat = new()
                 {
                     Message = chat.Message,
@@ -36,6 +49,12 @@ namespace Graduate_Project_BackEnd.Controllers
                 return Json(new { state = true, msg = "Success" });
             }
             return Json(new { state = false, msg = "You Not Accessed!" });
+        }
+        [HttpPost]
+        public IActionResult GetDataFile([FromForm] int id)
+        {
+            DataFile datafile = DB.DataFiles.Where(file=>file.Id == id).SingleOrDefault();
+            return Json(new { state = true, msg = "Success", data = datafile });
         }
         public IActionResult Display([FromForm] int team_id)
         {
@@ -60,7 +79,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             else if (currentUser.Role.Equals("proffessor"))
             {
-                var team = DB.Teams.Where(t => t.Id == id && t.ProfID == currentUser.Id).Select(t => t.Id ).ToList();
+                var team = DB.Teams.Where(t => t.Id == id && t.ProfID == currentUser.Id).Select(t => t.Id).ToList();
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
@@ -70,7 +89,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s =>new {s.Student.Id, s.Student.img});
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.Student.Id, s.Student.img });
             var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.Student.Id, s.Student.img });
             var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => p.Prof.img).ToList();
             if (members != null)

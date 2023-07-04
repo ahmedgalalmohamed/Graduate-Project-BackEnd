@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using apifirstproject1.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Graduate_Project_BackEnd.Models
 {
@@ -17,6 +18,7 @@ namespace Graduate_Project_BackEnd.Models
         //public DbSet<StudentTeamModel> Students_Teams { get; set; }
         public DbSet<SkilsModel> Skils { get; set; }
         public DbSet<ChatModel> Chat { get; set; }
+        public DbSet<DataFile> DataFiles { get; set; }
 
 
 
