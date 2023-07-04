@@ -184,6 +184,56 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = false, msg = "Can not change stat", data = team[0].IsComplete });
         }
 
+        [HttpPost]
+        [Authorize(Roles = "instructor")]
+        public IActionResult SetGrade([FromForm] int t_id, [FromForm] int grade)
+        {
+            var currentUser = GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            var team = DB.Courses_Students.SingleOrDefault(cs => cs.TeamID == t_id && cs.Course.Instructor.Id == currentUser.Id);
+            if (team != null)
+            {
+                team.Team.Grade = grade;
+                DB.SaveChanges();
+                return Json(new { state = true, msg = "Done" });
+
+            }
+            return Json(new { state = false, msg = "Failed" });
+        }
+        [HttpGet]
+        [Authorize(Roles = "student,proffessor,instructor")]
+        public IActionResult GetGrade([FromForm] int t_id)
+        {
+            int? grade = null;
+            var currentUser = GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Json(new { state = false, msg = "failed" });
+            }
+            if (currentUser.Role.Equals("proffessor"))
+            {
+                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.ProfID == currentUser.Id);
+                if (team != null)
+                    grade = team.Grade;
+
+            }
+            else if (currentUser.Role.Equals("instructor"))
+            {
+                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.Course.InstructorID == currentUser.Id);
+                if (team != null)
+                    grade = team.Grade;
+            }
+            else
+            {
+                var team = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == currentUser.Id && cs.TeamID == t_id);
+                if (team != null)
+                    grade = team.Team.Grade;
+            }
+            return Json(new { state = true, msg = "Done",data = grade });
+        }
 
         private UserLoginVM GetCurrentUser()
         {

@@ -4,23 +4,22 @@
 
 namespace apifirstproject1.Migrations
 {
-    public partial class v2 : Migration
+    public partial class v5 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Type",
-                table: "Chat",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            migrationBuilder.AddColumn<int>(
+                name: "Grade",
+                table: "Teams",
+                type: "int",
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Type",
-                table: "Chat");
+                name: "Grade",
+                table: "Teams");
         }
     }
 }
