@@ -216,24 +216,26 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Role.Equals("proffessor"))
             {
-                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.ProfID == currentUser.Id);
-                if (team != null)
-                    grade = team.Grade;
+                var team = DB.Teams.Where(t => t.Id == t_id && t.ProfID == currentUser.Id).ToList();
+                if (team.Count != 0)
+                    grade = team[0].Grade;
 
             }
             else if (currentUser.Role.Equals("instructor"))
             {
-                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.Course.InstructorID == currentUser.Id);
-                if (team != null)
-                    grade = team.Grade;
+                var team = DB.Teams.Where(t => t.Id == t_id && t.Course.InstructorID == currentUser.Id).ToList();
+                if (team.Count != 0)
+                    grade = team[0].Grade;
             }
             else
             {
-                var team = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == currentUser.Id && cs.TeamID == t_id);
-                if (team != null)
-                    grade = team.Team.Grade;
+                var team = DB.Courses_Students.Where(cs => cs.StudentID == currentUser.Id && cs.TeamID == t_id).Include(t => t.Team).ToList();
+                if (team.Count != 0)
+                {
+                    grade = team[0].Team.Grade;
+                }
             }
-            return Json(new { state = true, msg = "Done",data = grade });
+            return Json(new { state = true, msg = "Done", data = grade });
         }
 
         private UserLoginVM GetCurrentUser()
