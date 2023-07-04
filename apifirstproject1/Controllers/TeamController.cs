@@ -204,7 +204,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             return Json(new { state = false, msg = "Failed" });
         }
-        [HttpGet]
+        [HttpPost]
         [Authorize(Roles = "student,proffessor,instructor")]
         public IActionResult GetGrade([FromForm] int t_id)
         {
