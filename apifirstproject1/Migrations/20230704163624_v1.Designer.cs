@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace apifirstproject1.Migrations
 {
     [DbContext(typeof(DBCONTEXT))]
-    [Migration("20230704123125_v3")]
-    partial class v3
+    [Migration("20230704163624_v1")]
+    partial class v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,6 +33,10 @@ namespace apifirstproject1.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -418,6 +422,9 @@ namespace apifirstproject1.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Grade")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsComplete")

@@ -422,6 +422,9 @@ namespace apifirstproject1.Migrations
                     b.Property<int>("CourseID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("Grade")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsComplete")
                         .HasColumnType("bit");
 
