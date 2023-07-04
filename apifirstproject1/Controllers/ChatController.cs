@@ -17,7 +17,8 @@ namespace Graduate_Project_BackEnd.Controllers
         {
             DB = dB;
         }
-        public IActionResult Add([FromBody] ChatVM chat)
+
+        public async Task<IActionResult> Add([FromBody] ChatVM chat)
         {
             int? id_datafile = null;
             bool vf_dr = DB.Teams.Any(t => t.Id == chat.TeamId && t.ProfID == chat.SenderId);
@@ -29,10 +30,9 @@ namespace Graduate_Project_BackEnd.Controllers
                     DataFile dataFile = new()
                     {
                         data = chat.Message,
-                        name = chat.FileName
                     };
                     DB.DataFiles.Add(dataFile);
-                    DB.SaveChanges();
+                    await DB.SaveChangesAsync();
                     id_datafile = dataFile.Id;
                 }
                 if (id_datafile != null) chat.Message = id_datafile.ToString();
@@ -42,10 +42,11 @@ namespace Graduate_Project_BackEnd.Controllers
                     SenderId = chat.SenderId,
                     TeamID = chat.TeamId,
                     Role = chat.Role,
-                    Type = chat.Type
+                    Type = chat.Type,
+                    FileName = chat.FileName
                 };
                 DB.Chat.Add(newchat);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync();
                 return Json(new { state = true, msg = "Success" });
             }
             return Json(new { state = false, msg = "You Not Accessed!" });
@@ -53,7 +54,7 @@ namespace Graduate_Project_BackEnd.Controllers
         [HttpPost]
         public IActionResult GetDataFile([FromForm] int id)
         {
-            DataFile datafile = DB.DataFiles.Where(file=>file.Id == id).SingleOrDefault();
+            DataFile datafile = DB.DataFiles.Where(file => file.Id == id).SingleOrDefault();
             return Json(new { state = true, msg = "Success", data = datafile });
         }
         public IActionResult Display([FromForm] int team_id)

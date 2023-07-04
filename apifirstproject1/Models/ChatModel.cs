@@ -10,5 +10,7 @@
         public TeamModel Team { get; set; }
         public int TeamID { get; set; }
         public string Type { get; set; } = "msg";
+        public string FileName { get; set; } = "";
+
     }
 }
