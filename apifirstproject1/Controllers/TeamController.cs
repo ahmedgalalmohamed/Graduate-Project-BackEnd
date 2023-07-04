@@ -193,10 +193,11 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var team = DB.Courses_Students.SingleOrDefault(cs => cs.TeamID == t_id && cs.Course.Instructor.Id == currentUser.Id);
-            if (team != null)
+            var auth = DB.Courses_Students.Where(cs => cs.TeamID == t_id && cs.Course.Instructor.Id == currentUser.Id).ToList();
+            if (auth.Count != 0)
             {
-                team.Team.Grade = grade;
+                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id);
+                team.Grade = grade;
                 DB.SaveChanges();
                 return Json(new { state = true, msg = "Done" });
 
