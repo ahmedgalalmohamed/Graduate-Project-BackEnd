@@ -3,6 +3,7 @@ using Graduate_Project_BackEnd.Models;
 using Graduate_Project_BackEnd.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PusherServer;
 using System.Security.Claims;
 
@@ -90,12 +91,13 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.Student.Id, s.Student.img });
-            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.Student.Id, s.Student.img });
-            var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => p.Prof.img).ToList();
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.CourseID, s.Student.Id, s.Student.img ,role = "student"});
+            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.Student.Id, s.Student.img ,role = "student"});
+            var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p =>new { p.Prof.img, role = "proffessor" }).ToList();
+            var instructor = DB.Courses.Where(c => c.Id == leader.ToList()[0].CourseID).Include(c => c.Instructor).Select(c => new { c.Instructor.Id, role = "instructor", img = c.Instructor.img });
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] } , instructor});
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }

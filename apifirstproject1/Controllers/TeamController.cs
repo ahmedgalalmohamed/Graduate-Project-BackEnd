@@ -104,9 +104,10 @@ namespace Graduate_Project_BackEnd.Controllers
             var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID, s.CourseID, course = s.Course.Name, team = s.Team.Name, s.Team.IsComplete, role = "student", img = "" });
             var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, role = "student", img = "" });
             var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => new { p.Prof.Id, p.Prof.Name, p.Prof.Email, role = "proffessor", img = "" }).ToList();
+            var instructor = DB.Courses.Where(c => c.Id == leader.ToList()[0].CourseID).Include(c => c.Instructor).Select(c => new {c.Instructor.Id, c.Instructor.Name, c.Instructor.Email, role = "instructor", img = ""});
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0], instructor } });
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }
