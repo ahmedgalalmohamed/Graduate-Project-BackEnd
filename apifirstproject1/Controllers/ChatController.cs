@@ -47,7 +47,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 };
                 DB.Chat.Add(newchat);
                 await DB.SaveChangesAsync();
-                return Json(new { state = true, msg = "Success" });
+                return Json(new { state = true, msg = "Success" ,data = newchat.FileName});
             }
             return Json(new { state = false, msg = "You Not Accessed!" });
         }
