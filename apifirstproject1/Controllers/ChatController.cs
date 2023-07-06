@@ -57,10 +57,10 @@ namespace Graduate_Project_BackEnd.Controllers
             DataFile datafile = DB.DataFiles.Where(file => file.Id == id).SingleOrDefault();
             return Json(new { state = true, msg = "Success", data = datafile });
         }
-        public IActionResult Display([FromForm] int team_id)
+        public IActionResult Display([FromForm] int team_id, [FromForm] int number_of_row)
         {
-            List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).ToList();
-            return Json(new { state = true, msg = "Success", data = chats });
+            List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).TakeLast(number_of_row).ToList();
+            return Json(new { state = true, msg = "Success", data = chats, numberOfRow = number_of_row + 10 });
         }
 
         [Authorize(Roles = "student,proffessor,instructor")]
