@@ -48,7 +48,7 @@ namespace Graduate_Project_BackEnd.Controllers
                 };
                 DB.Chat.Add(newchat);
                 await DB.SaveChangesAsync();
-                return Json(new { state = true, msg = "Success" ,data = newchat.FileName});
+                return Json(new { state = true, msg = "Success", data = newchat.FileName });
             }
             return Json(new { state = false, msg = "You Not Accessed!" });
         }
@@ -58,10 +58,20 @@ namespace Graduate_Project_BackEnd.Controllers
             DataFile datafile = DB.DataFiles.Where(file => file.Id == id).SingleOrDefault();
             return Json(new { state = true, msg = "Success", data = datafile });
         }
+        [HttpPost]
         public IActionResult Display([FromForm] int team_id, [FromForm] int number_of_row)
         {
-            List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).TakeLast(number_of_row).ToList();
-            return Json(new { state = true, msg = "Success", data = chats, numberOfRow = number_of_row + 10 });
+
+            List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).ToList();
+            if (chats.Count <= number_of_row) number_of_row = chats.Count;
+            return Json(new { state = true, msg = "Success", data = chats.TakeLast(number_of_row), numberOfRow = number_of_row });
+        }
+        [HttpPost("pusher")]
+        public IActionResult Display([FromForm] int team_id)
+        {
+
+            List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).ToList();
+            return Json(new { state = true, msg = "Success", data = chats.TakeLast(10)});
         }
 
         [Authorize(Roles = "student,proffessor,instructor")]
@@ -91,13 +101,13 @@ namespace Graduate_Project_BackEnd.Controllers
                 if (team.Count == 0)
                     return Json(new { state = false, msg = "Failed to get data" });
             }
-            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.CourseID, s.Student.Id, s.Student.img ,role = "student"});
-            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.Student.Id, s.Student.img ,role = "student"});
-            var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p =>new { p.Prof.img, role = "proffessor" }).ToList();
+            var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.CourseID, s.Student.Id, s.Student.img, role = "student" });
+            var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.Student.Id, s.Student.img, role = "student" });
+            var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => new { p.Prof.img, role = "proffessor" }).ToList();
             var instructor = DB.Courses.Where(c => c.Id == leader.ToList()[0].CourseID).Include(c => c.Instructor).Select(c => new { c.Instructor.Id, role = "instructor", img = c.Instructor.img }).ToList();
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] , instructor = instructor[0] } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0], instructor = instructor[0] } });
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }
