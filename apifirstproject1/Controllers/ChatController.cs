@@ -59,19 +59,18 @@ namespace Graduate_Project_BackEnd.Controllers
             return Json(new { state = true, msg = "Success", data = datafile });
         }
         [HttpPost]
-        public IActionResult Display([FromForm] int team_id, [FromForm] int number_of_row)
+        public IActionResult DisplayWithFixRow([FromForm] int team_id, [FromForm] int number_of_row)
         {
-
             List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).ToList();
-            if (chats.Count <= number_of_row) number_of_row = chats.Count;
-            return Json(new { state = true, msg = "Success", data = chats.TakeLast(number_of_row), numberOfRow = number_of_row });
+            List<ChatModel> chatsfixrow = chats.SkipLast(number_of_row).TakeLast(10).ToList();
+            return Json(new { state = true, msg = "Success", data = chatsfixrow, numberOfRow = number_of_row + 10 });
         }
         [HttpPost("pusher")]
         public IActionResult Display([FromForm] int team_id)
         {
 
             List<ChatModel> chats = DB.Chat.Where(c => c.TeamID == team_id).ToList();
-            return Json(new { state = true, msg = "Success", data = chats.TakeLast(10)});
+            return Json(new { state = true, msg = "Success", data = chats.TakeLast(10) });
         }
 
         [Authorize(Roles = "student,proffessor,instructor")]
