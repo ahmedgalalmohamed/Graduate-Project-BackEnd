@@ -104,9 +104,10 @@ namespace Graduate_Project_BackEnd.Controllers
             var leader = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID == cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, teamId = s.TeamID, s.CourseID, course = s.Course.Name, team = s.Team.Name, s.Team.IsComplete, role = "student", img = "" });
             var members = DB.Courses_Students.Where(cs => cs.TeamID == id && cs.Team.LeaderID != cs.StudentID).Select(s => new { s.StudentID, s.Student.Name, s.Student.Email, role = "student", img = "" });
             var professor = DB.Teams.Where(t => t.Id == id && t.ProfID != null).Select(p => new { p.Prof.Id, p.Prof.Name, p.Prof.Email, role = "proffessor", img = "" }).ToList();
+            var instructor = DB.Courses.Where(c => c.Id == leader.ToList()[0].CourseID).Include(c => c.Instructor).Select(c => new {c.Instructor.Id, c.Instructor.Name, c.Instructor.Email, role = "instructor", img = ""}).ToList();
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0] } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0], instructor = instructor[0] } });
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }
@@ -193,17 +194,18 @@ namespace Graduate_Project_BackEnd.Controllers
             {
                 return Json(new { state = false, msg = "failed" });
             }
-            var team = DB.Courses_Students.SingleOrDefault(cs => cs.TeamID == t_id && cs.Course.Instructor.Id == currentUser.Id);
-            if (team != null)
+            var auth = DB.Courses_Students.Where(cs => cs.TeamID == t_id && cs.Course.Instructor.Id == currentUser.Id).ToList();
+            if (auth.Count != 0)
             {
-                team.Team.Grade = grade;
+                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id);
+                team.Grade = grade;
                 DB.SaveChanges();
                 return Json(new { state = true, msg = "Done" });
 
             }
             return Json(new { state = false, msg = "Failed" });
         }
-        [HttpGet]
+        [HttpPost]
         [Authorize(Roles = "student,proffessor,instructor")]
         public IActionResult GetGrade([FromForm] int t_id)
         {
@@ -215,24 +217,26 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Role.Equals("proffessor"))
             {
-                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.ProfID == currentUser.Id);
-                if (team != null)
-                    grade = team.Grade;
+                var team = DB.Teams.Where(t => t.Id == t_id && t.ProfID == currentUser.Id).ToList();
+                if (team.Count != 0)
+                    grade = team[0].Grade;
 
             }
             else if (currentUser.Role.Equals("instructor"))
             {
-                var team = DB.Teams.SingleOrDefault(t => t.Id == t_id && t.Course.InstructorID == currentUser.Id);
-                if (team != null)
-                    grade = team.Grade;
+                var team = DB.Teams.Where(t => t.Id == t_id && t.Course.InstructorID == currentUser.Id).ToList();
+                if (team.Count != 0)
+                    grade = team[0].Grade;
             }
             else
             {
-                var team = DB.Courses_Students.SingleOrDefault(cs => cs.StudentID == currentUser.Id && cs.TeamID == t_id);
-                if (team != null)
-                    grade = team.Team.Grade;
+                var team = DB.Courses_Students.Where(cs => cs.StudentID == currentUser.Id && cs.TeamID == t_id).Include(t => t.Team).ToList();
+                if (team.Count != 0)
+                {
+                    grade = team[0].Team.Grade;
+                }
             }
-            return Json(new { state = true, msg = "Done",data = grade });
+            return Json(new { state = true, msg = "Done", data = grade });
         }
 
         private UserLoginVM GetCurrentUser()
