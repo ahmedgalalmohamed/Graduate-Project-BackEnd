@@ -107,7 +107,7 @@ namespace Graduate_Project_BackEnd.Controllers
             var instructor = DB.Courses.Where(c => c.Id == leader.ToList()[0].CourseID).Include(c => c.Instructor).Select(c => new {c.Instructor.Id, c.Instructor.Name, c.Instructor.Email, role = "instructor", img = ""});
             if (members != null)
             {
-                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0], instructor } });
+                return Json(new { state = true, msg = "Success", data = new { leader, members, professor = professor.Count == 0 ? null : professor[0], instructor[0] } });
             }
             return Json(new { state = false, msg = "Failed to get data" });
         }
