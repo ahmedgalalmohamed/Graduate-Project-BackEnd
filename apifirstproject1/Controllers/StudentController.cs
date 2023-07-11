@@ -94,16 +94,50 @@ namespace Graduate_Project_BackEnd.Controllers
             oldStudent.Semester = student.Semester;
             DB.Students.Update(oldStudent);
             DB.SaveChanges();
-            List<Courses_StudentsModel> oldCS = DB.Courses_Students.Where(cs => cs.StudentID == oldStudent.Id).ToList();
-            DB.Courses_Students.RemoveRange(oldCS);
-            DB.SaveChanges();
             List<Courses_StudentsModel> newCS = new List<Courses_StudentsModel>();
             foreach (int stud_cr in student.CoursesID)
             {
                 newCS.Add(new Courses_StudentsModel() { StudentID = oldStudent.Id, CourseID = stud_cr });
             }
-            DB.Courses_Students.AddRange(newCS);
-            DB.SaveChanges();
+            List<Courses_StudentsModel> oldCS = DB.Courses_Students.Where(cs => cs.StudentID == oldStudent.Id).ToList();
+            List<Courses_StudentsModel> deletedCrs = new List<Courses_StudentsModel>();
+            for (int i = 0; i < oldCS.Count; i++)
+            {
+                if (!student.CoursesID.Contains(oldCS[i].CourseID))
+                {
+                    deletedCrs.Add(oldCS[i]);
+                    if (oldCS[i].TeamID != null)
+                    {
+                        var cour_std = DB.Courses_Students.Where(cs => cs.TeamID == oldCS[i].TeamID).ToList();
+                        for(int j = 0; j < cour_std.Count; j++)
+                        {
+                            cour_std[j].TeamID = null;
+                        }
+                        DB.SaveChanges();
+                        var team = DB.Teams.Where(t => t.Id == oldCS[i].TeamID).ToList();
+                        if (team.Count > 0)
+                        {
+                            DB.Teams.RemoveRange(team);
+                            DB.SaveChanges();
+                        }
+
+                    }
+                }
+                else
+                    newCS.Remove(newCS.SingleOrDefault(c => c.CourseID == oldCS[i].CourseID));
+
+            }
+            if (deletedCrs.Count > 0)
+            {
+                DB.Courses_Students.RemoveRange(deletedCrs);
+                DB.SaveChanges();
+
+            }
+            if (newCS.Count > 0)
+            {
+                DB.Courses_Students.AddRange(newCS);
+                DB.SaveChanges();
+            }
             return Display();
         }
         [Authorize(Roles = "admin")]
