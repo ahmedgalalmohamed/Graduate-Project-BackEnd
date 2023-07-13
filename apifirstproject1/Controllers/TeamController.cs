@@ -123,7 +123,7 @@ namespace Graduate_Project_BackEnd.Controllers
             }
             if (currentUser.Id == id)
             {
-                var team = DB.Teams.Where(t => t.Id == t_id).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete }).ToList();
+                var team = DB.Teams.Where(t => t.Id == t_id).Select(t => new { t.Id, t.Name, t.LeaderID, t.CourseID, t.IsComplete,t.Course.MinStd }).ToList();
                 if (team.Count > 0)
                 {
                     var std = DB.Courses_Students.Single(s => s.StudentID == currentUser.Id && s.CourseID == team[0].CourseID);
@@ -138,13 +138,14 @@ namespace Graduate_Project_BackEnd.Controllers
                         DB.Notifications.RemoveRange(notifications);
                         DB.SaveChanges();
                     }
+                    var cnt = DB.Courses_Students.Where(cs => cs.TeamID == t_id).ToList().Count;
                     DB.Teams.Update(new TeamModel()
                     {
                         Id = team[0].Id,
                         Name = team[0].Name,
                         CourseID = team[0].CourseID,
                         LeaderID = team[0].LeaderID,
-                        IsComplete = false,
+                        IsComplete = cnt >= team[0].MinStd && team[0].IsComplete == true ? true:false,
                     });
                     DB.SaveChanges();
                     return Json(new { state = true, msg = "Done" });
